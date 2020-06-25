@@ -4,6 +4,7 @@
 #include <QImage>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
+#include <QResizeEvent>
 #include <QSize>
 #include <QWidget>
 
@@ -15,6 +16,7 @@ class Canvas : public QWidget
     public:
         explicit Canvas(QWidget* parent = 0);
         QSize sizeHint(void);
+        void resizeEvent(QResizeEvent* event);
 
     private:
         QGraphicsScene* scene;
@@ -22,6 +24,9 @@ class Canvas : public QWidget
 
     public slots:
         void draw(QImage img);
+
+    signals:
+        void sizeChanged(int width, int height);
 };
 
 #endif // CANVAS_H

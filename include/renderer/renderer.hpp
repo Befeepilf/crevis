@@ -17,6 +17,7 @@ class Renderer : public QObject
 
     public:
         Renderer(std::vector<Mesh> meshes = {});
+        double getFocalLen();
         void setWidth(unsigned int width);
         void setHeight(unsigned int height);
         void addMesh(Mesh mesh);
@@ -25,7 +26,8 @@ class Renderer : public QObject
     private:
         unsigned int width;
         unsigned int height;
-        double focalLength;
+        double aspectRatio;
+        double focalLen;
         std::vector<Mesh> meshes;
         QImage* image;
 
@@ -33,10 +35,13 @@ class Renderer : public QObject
         void drawLine(Vec2d p1, Vec2d p2);
 
     public slots:
+        void setSize(int newWidth, int newHeight);
         void createCube(void);
+        void setFocalLen(double newFocalLen);
 
     signals:
         void renderedFrame(QImage img);
+        void focalLenChanged(double focalLen);
 };
 
 #endif // RENDERER_H

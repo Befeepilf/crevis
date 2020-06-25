@@ -14,7 +14,22 @@ Renderer::Renderer(std::vector<Mesh> meshes) : meshes(meshes)
 {
     width = 200;
     height = 200;
-    focalLength = 0.5;
+    aspectRatio = height / width;
+    focalLen = 0.5;
+}
+
+double Renderer::getFocalLen()
+{
+    return focalLen * 200;
+}
+
+void Renderer::setSize(int newWidth, int newHeight)
+{
+    width = newWidth;
+    height = newHeight;
+    aspectRatio = (double) height / (double) width;
+
+    render();
 }
 
 void Renderer::addMesh(Mesh mesh)
@@ -27,6 +42,13 @@ void Renderer::createCube()
 {
     Mesh cube = Mesh::cube();
     addMesh(cube);
+}
+
+void Renderer::setFocalLen(double newFocalLen)
+{
+    if (newFocalLen != focalLen) emit focalLenChanged(newFocalLen);
+    focalLen = newFocalLen / 200;
+    render();
 }
 
 void Renderer::drawLine(Vec2d p1, Vec2d p2)
@@ -77,12 +99,11 @@ void Renderer::drawLine(Vec2d p1, Vec2d p2)
 
 Vec2d Renderer::projectVec3d(Vec3d v)
 {
-    double aspectRatio = height / width;
-    double fovCorrW = focalLength / 0.5;
-    double fovCorrH = focalLength / 0.5;
+    double fovCorrW = focalLen / 0.5;
+    double fovCorrH = focalLen / 0.5;
 
-    int x = width/2 * v.x() * fovCorrW * aspectRatio / (v.z() + 1 + focalLength) + width/2;
-    int y = height/2 * v.y() * fovCorrH / (v.z() + 1 + focalLength) + width/2;
+    int x = width/2 * v.x() * fovCorrW * aspectRatio / (v.z() + 1 + focalLen) + width/2;
+    int y = height/2 * v.y() * fovCorrH / (v.z() + 1 + focalLen) + height/2;
 
     return Vec2d(x, y);
 }
@@ -99,14 +120,12 @@ void Renderer::render()
 
         for (Triangle t : m.triangles)
         {
-            std::cout << "Triangle" << std::endl;
-
             // 3D projection
             Vec2d p1Proj = projectVec3d(t.p1);
             Vec2d p2Proj = projectVec3d(t.p2);
             Vec2d p3Proj = projectVec3d(t.p3);
 
-            // draw projected triangle
+            // draw projected triangles
             drawLine(p1Proj, p2Proj);
             drawLine(p2Proj, p3Proj);
             drawLine(p3Proj, p1Proj);

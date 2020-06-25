@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QImage>
 #include <QPixmap>
+#include <QResizeEvent>
 #include <QSize>
 #include <QSizePolicy>
 #include <QWidget>
@@ -36,6 +37,11 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent)
 QSize Canvas::sizeHint()
 {
     return QSize(500, 500);
+}
+
+void Canvas::resizeEvent(QResizeEvent* event)
+{
+    emit sizeChanged(width(), height());
 }
 
 void Canvas::draw(QImage img)
