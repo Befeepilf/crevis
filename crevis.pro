@@ -12,6 +12,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 
 HEADERS += include/gui/canvas.hpp \
+           include/gui/meshesList.hpp \
            include/gui/window.hpp \
            include/renderer/mesh.hpp \
            include/renderer/renderer.hpp \
@@ -22,6 +23,7 @@ HEADERS += include/gui/canvas.hpp \
 
 SOURCES += src/main.cpp \
            src/gui/canvas.cpp \
+           src/gui/meshesList.cpp \
            src/gui/window.cpp \
            src/renderer/mesh.cpp \
            src/renderer/renderer.cpp \

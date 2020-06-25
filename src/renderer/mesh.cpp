@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-Mesh::Mesh(std::vector<Triangle> triangles) : triangles(triangles)
+Mesh::Mesh(const char* name, std::vector<Triangle> triangles) : name(name), triangles(triangles)
 {
 
 }
@@ -23,9 +23,9 @@ void Mesh::scale(double factor)
     }
 }
 
-Mesh Mesh::cube()
+Mesh* Mesh::cube()
 {
-    return Mesh({
+    return new Mesh("Cube", {
         // front face
         Triangle({0, 0, 0}, {0, 1, 0}, {1, 0, 0}),
         Triangle({1, 0, 0}, {0, 1, 0}, {1, 1, 0}),

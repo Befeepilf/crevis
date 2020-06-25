@@ -1,8 +1,10 @@
 #include "gui/canvas.hpp"
+#include "gui/meshesList.hpp"
 #include "gui/window.hpp"
 #include "renderer/renderer.hpp"
 
 #include <QAction>
+#include <QDockWidget>
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QStatusBar>
@@ -18,6 +20,7 @@ Window::Window(QWidget* parent) : QMainWindow(parent), renderer(new Renderer)
     createMenus();
     createToolbar();
 
+
     Canvas* canvas = new Canvas();
     setCentralWidget(canvas);
 
@@ -25,6 +28,13 @@ Window::Window(QWidget* parent) : QMainWindow(parent), renderer(new Renderer)
     connect(renderer, &Renderer::renderedFrame, canvas, &Canvas::draw);
     // whenever size of canvas changes, change size of renderer
     connect(canvas, &Canvas::sizeChanged, renderer, &Renderer::setSize);
+
+
+    QDockWidget* meshesListWidgetContainer = new QDockWidget(tr("Meshes"), this);
+    MeshesList* meshesListWidget = new MeshesList;
+    connect(renderer, &Renderer::addedMesh, meshesListWidget, &MeshesList::addMesh);
+    meshesListWidgetContainer->setWidget(meshesListWidget);
+    addDockWidget(Qt::RightDockWidgetArea, meshesListWidgetContainer);
 
     showStatus("Ready");
 }

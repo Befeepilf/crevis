@@ -8,14 +8,15 @@
 class Mesh
 {
     public:
-        Mesh(std::vector<Triangle> triangles = {});
+        Mesh(const char* name = "", std::vector<Triangle> triangles = {});
 
+        const char* name;
         std::vector<Triangle> triangles;
 
         void addTriangle(Triangle triangle);
         void scale(double factor);
         
-        static Mesh cube(void);
+        static Mesh* cube(void);
 };
 
 

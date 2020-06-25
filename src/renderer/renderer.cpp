@@ -10,7 +10,7 @@
 #include <vector>
 
 
-Renderer::Renderer(std::vector<Mesh> meshes) : meshes(meshes)
+Renderer::Renderer(std::vector<Mesh*> meshes) : meshes(meshes)
 {
     width = 200;
     height = 200;
@@ -32,15 +32,16 @@ void Renderer::setSize(int newWidth, int newHeight)
     render();
 }
 
-void Renderer::addMesh(Mesh mesh)
+void Renderer::addMesh(Mesh* mesh)
 {
     meshes.push_back(mesh);
+    emit addedMesh(mesh);
     render();
 }
 
 void Renderer::createCube()
 {
-    Mesh cube = Mesh::cube();
+    Mesh* cube = Mesh::cube();
     addMesh(cube);
 }
 
@@ -114,11 +115,11 @@ void Renderer::render()
 
     image = new QImage(width, height, QImage::Format_RGB32);
 
-    for (Mesh m : meshes)
+    for (Mesh* m : meshes)
     {
         std::cout << "Mesh" << std::endl;
 
-        for (Triangle t : m.triangles)
+        for (Triangle t : m->triangles)
         {
             // 3D projection
             Vec2d p1Proj = projectVec3d(t.p1);

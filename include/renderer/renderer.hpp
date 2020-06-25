@@ -16,11 +16,11 @@ class Renderer : public QObject
     Q_OBJECT
 
     public:
-        Renderer(std::vector<Mesh> meshes = {});
+        Renderer(std::vector<Mesh*> meshes = {});
         double getFocalLen();
         void setWidth(unsigned int width);
         void setHeight(unsigned int height);
-        void addMesh(Mesh mesh);
+        void addMesh(Mesh* mesh);
         void render();
     
     private:
@@ -28,7 +28,7 @@ class Renderer : public QObject
         unsigned int height;
         double aspectRatio;
         double focalLen;
-        std::vector<Mesh> meshes;
+        std::vector<Mesh*> meshes;
         QImage* image;
 
         Vec2d projectVec3d(Vec3d v);
@@ -42,6 +42,7 @@ class Renderer : public QObject
     signals:
         void renderedFrame(QImage img);
         void focalLenChanged(double focalLen);
+        void addedMesh(Mesh* mesh);
 };
 
 #endif // RENDERER_H
