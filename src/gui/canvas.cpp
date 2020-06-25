@@ -10,7 +10,8 @@
 #include <QWidget>
 
 
-Canvas::Canvas(QWidget* parent) : QWidget(parent) {
+Canvas::Canvas(QWidget* parent) : QWidget(parent)
+{
     // set size policy
     QSizePolicy sizePolicy;
     sizePolicy.setHorizontalPolicy(QSizePolicy::Expanding);

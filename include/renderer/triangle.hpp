@@ -1,15 +1,15 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
-#include "renderer/vector/vector3d.hpp"
+#include "renderer/vector/vec3d.hpp"
 
 class Triangle
 {
     public:
-        explicit Triangle(Vector3d p1, Vector3d p2, Vector3d p3);
-        Vector3d p1;
-        Vector3d p2;
-        Vector3d p3;
+        explicit Triangle(Vec3d p1, Vec3d p2, Vec3d p3);
+        Vec3d p1;
+        Vec3d p2;
+        Vec3d p3;
 };
 
 #endif // TRIANGLE_H

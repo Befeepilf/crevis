@@ -1,14 +1,15 @@
-#include "renderer/vector/vector.hpp"
+#include "renderer/vector/vec.hpp"
 
 #include <cmath>
+#include <iostream>
 #include <vector>
 
-Vector::Vector(std::vector<double> components) : components(components)
+Vec::Vec(std::vector<double> components) : components(components)
 {
 
 }
 
-double Vector::length()
+double Vec::length()
 {
     double sum = 0;
     for (double c : components)
@@ -20,9 +21,9 @@ double Vector::length()
 }
 
 // operator overload: add two vectors
-Vector Vector::operator+(Vector v)
+Vec Vec::operator+(Vec v)
 {
-    Vector new_v (components);
+    Vec new_v (components);
 
     for (unsigned int i = 0; i < v.components.size(); i++)
     {
@@ -32,10 +33,10 @@ Vector Vector::operator+(Vector v)
     return new_v;
 }
 
-// operator overload: scale this vector
-Vector Vector::operator*(double s)
+// operator overload: scale copy of this vector
+Vec Vec::operator*(double s)
 {
-    Vector new_v (components);
+    Vec new_v (components);
 
     for (unsigned int i = 0; i < new_v.components.size(); i++)
     {
@@ -45,8 +46,19 @@ Vector Vector::operator*(double s)
     return new_v;
 }
 
+// operator overload: scale this vector
+Vec Vec::operator*=(double s)
+{
+    for (unsigned int i = 0; i < components.size(); i++)
+    {
+        components[i] *= s;
+    }
+
+    return *this;
+}
+
 // operator overload: dot product
-double Vector::operator*(Vector v)
+double Vec::operator*(Vec v)
 {
     double sum = 0;
 

@@ -16,8 +16,9 @@ HEADERS += include/gui/canvas.hpp \
            include/renderer/mesh.hpp \
            include/renderer/renderer.hpp \
            include/renderer/triangle.hpp \
-           include/renderer/vector/vector.hpp \
-           include/renderer/vector/vector3d.hpp
+           include/renderer/vector/vec.hpp \
+           include/renderer/vector/vec2d.hpp \
+           include/renderer/vector/vec3d.hpp
 
 SOURCES += src/main.cpp \
            src/gui/canvas.cpp \
@@ -25,5 +26,6 @@ SOURCES += src/main.cpp \
            src/renderer/mesh.cpp \
            src/renderer/renderer.cpp \
            src/renderer/triangle.cpp \
-           src/renderer/vector/vector.cpp \
-           src/renderer/vector/vector3d.cpp
+           src/renderer/vector/vec.cpp \
+           src/renderer/vector/vec2d.cpp \
+           src/renderer/vector/vec3d.cpp

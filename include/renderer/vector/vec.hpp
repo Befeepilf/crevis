@@ -3,21 +3,24 @@
 
 #include <vector>
 
-class Vector
+class Vec
 {
     public:
-        Vector(std::vector<double> components);
+        Vec(std::vector<double> components);
         double length(void);
 
         std::vector<double> components;
 
         // operator overload: add two vectors
-        Vector operator+(const Vector v);
+        Vec operator+(const Vec v);
 
+        // operator overload: scale copy of this vector
+        Vec operator*(const double s);
         // operator overload: scale this vector
-        Vector operator*(const double s);
+        Vec operator*=(const double s);
+
         // operator overload: dot product
-        double operator*(const Vector v);
+        double operator*(const Vec v);
 };
 
 #endif // VECTOR_H
