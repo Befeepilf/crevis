@@ -5,7 +5,9 @@
 
 Mesh::Mesh(const char* name, std::vector<Triangle> triangles) : name(name), triangles(triangles)
 {
-
+    angleX = 0;
+    angleY = 0;
+    angleZ = 0;
 }
 
 void Mesh::addTriangle(Triangle triangle)
@@ -21,7 +23,58 @@ void Mesh::scale(double factor)
         triangles[t].p2 *= factor;
         triangles[t].p3 *= factor;
     }
+
+    emit changed();
 }
+
+void Mesh::rotateX(double angle)
+{
+    double angleChange = angle - angleX;
+
+    for (unsigned int t = 0; t < triangles.size(); t++)
+    {
+        triangles[t].p1.rotateX(angleChange);
+        triangles[t].p2.rotateX(angleChange);
+        triangles[t].p3.rotateX(angleChange);
+    }
+
+    angleX = angle;
+
+    emit changed();
+}
+
+void Mesh::rotateY(double angle)
+{
+    double angleChange = angle - angleY;
+
+    for (unsigned int t = 0; t < triangles.size(); t++)
+    {
+        triangles[t].p1.rotateY(angleChange);
+        triangles[t].p2.rotateY(angleChange);
+        triangles[t].p3.rotateY(angleChange);
+    }
+
+    angleY = angle;
+
+    emit changed();
+}
+
+void Mesh::rotateZ(double angle)
+{
+    double angleChange = angle - angleZ;
+
+    for (unsigned int t = 0; t < triangles.size(); t++)
+    {
+        triangles[t].p1.rotateZ(angleChange);
+        triangles[t].p2.rotateZ(angleChange);
+        triangles[t].p3.rotateZ(angleChange);
+    }
+
+    angleZ = angle;
+
+    emit changed();
+}
+
 
 Mesh* Mesh::cube()
 {

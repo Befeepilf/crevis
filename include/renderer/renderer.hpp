@@ -21,7 +21,6 @@ class Renderer : public QObject
         void setWidth(unsigned int width);
         void setHeight(unsigned int height);
         void addMesh(Mesh* mesh);
-        void render();
     
     private:
         unsigned int width;
@@ -29,6 +28,7 @@ class Renderer : public QObject
         double aspectRatio;
         double focalLen;
         std::vector<Mesh*> meshes;
+        Mesh* selectedMesh;
         QImage* image;
 
         Vec2d projectVec3d(Vec3d v);
@@ -38,6 +38,13 @@ class Renderer : public QObject
         void setSize(int newWidth, int newHeight);
         void createCube(void);
         void setFocalLen(double newFocalLen);
+        void setSelectedMesh(Mesh* mesh);
+
+        void setXRotOfSelectedMesh(double angle);
+        void setYRotOfSelectedMesh(double angle);
+        void setZRotOfSelectedMesh(double angle);
+
+        void render();
 
     signals:
         void renderedFrame(QImage img);

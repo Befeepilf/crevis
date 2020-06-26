@@ -4,6 +4,7 @@
 #include "renderer/mesh.hpp"
 
 #include <QListWidget>
+#include <QListWidgetItem>
 #include <QWidget>
 
 class MeshesList : public QListWidget
@@ -15,6 +16,12 @@ class MeshesList : public QListWidget
 
     public slots:
         void addMesh(Mesh* mesh);
+    
+    private slots:
+        void selectMesh(QListWidgetItem* listWidgetItem);
+
+    signals:
+        void selectedMesh(Mesh* mesh);
 };
 
 #endif // MESHES_LIST_H

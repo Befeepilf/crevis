@@ -34,6 +34,7 @@ void Renderer::setSize(int newWidth, int newHeight)
 
 void Renderer::addMesh(Mesh* mesh)
 {
+    connect(mesh, &Mesh::changed, this, &Renderer::render);
     meshes.push_back(mesh);
     emit addedMesh(mesh);
     render();
@@ -42,6 +43,7 @@ void Renderer::addMesh(Mesh* mesh)
 void Renderer::createCube()
 {
     Mesh* cube = Mesh::cube();
+    cube->rotateZ(3.14 / 2);
     addMesh(cube);
 }
 
@@ -52,42 +54,50 @@ void Renderer::setFocalLen(double newFocalLen)
     render();
 }
 
+void Renderer::setSelectedMesh(Mesh* mesh)
+{
+    std::cout << "Set selected mesh to " << mesh->name << std::endl;
+    selectedMesh = mesh;
+}
+
+
+void Renderer::setXRotOfSelectedMesh(double angle)
+{
+    if (selectedMesh != nullptr)
+    {
+        selectedMesh->rotateX(angle / 100);
+    }
+}
+
+void Renderer::setYRotOfSelectedMesh(double angle)
+{
+    if (selectedMesh != nullptr)
+    {
+        selectedMesh->rotateY(angle / 100);
+    }
+}
+
+void Renderer::setZRotOfSelectedMesh(double angle)
+{
+    if (selectedMesh != nullptr)
+    {
+        selectedMesh->rotateZ(angle / 100);
+    }
+}
+
+
 void Renderer::drawLine(Vec2d p1, Vec2d p2)
 {
-    int xStart, xEnd;
-    if (p1.x() < p2.x())
-    {
-        xStart = p1.x();
-        xEnd = p2.x();
-    }
-    else
-    {
-        xStart = p2.x();
-        xEnd = p1.x();
-    }
-
-    int yStart, yEnd;
-    if (p1.y() < p2.y())
-    {
-        yStart = p1.y();
-        yEnd = p2.y();
-    }
-    else
-    {
-        yStart = p2.y();
-        yEnd = p1.y();
-    }
-
     unsigned int len = 0;
-    len += pow(xEnd - xStart, 2);
-    len += pow(yEnd - yStart, 2);
+    len += pow(p1.x() - p2.x(), 2);
+    len += pow(p1.y() - p2.y(), 2);
     len = sqrt(len);
 
     unsigned currLen = 0;
     while (currLen < len)
     {
-        int pixelX = xStart + currLen * (xEnd - xStart) / len;
-        int pixelY = yStart + currLen * (yEnd - yStart) / len;
+        int pixelX = p1.x() + currLen * (p2.x() - p1.x()) / len;
+        int pixelY = p1.y() + currLen * (p2.y() - p1.y()) / len;
 
         if (pixelX < width && pixelX >= 0 && pixelY < height && pixelY >= 0)
         {

@@ -6,7 +6,12 @@
 
 Vec::Vec(std::vector<double> components) : components(components)
 {
-
+    // create initial transformation matrix which is the identity matrix of size n x n where n is the number of dimensions of this vector
+    // std::vector<std::vector<double>> transformMatrix (components.size(), std::vector<double> (components.size(), 0));
+    // for (unsigned int i = 0; i < components.size(); i++)
+    // {
+    //     transformMatrix[i][i] = 1;
+    // }
 }
 
 double Vec::length()
