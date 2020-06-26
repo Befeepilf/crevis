@@ -12,3 +12,6 @@ Run the following commands
 2. `make`
 
 Run the application with `./build/crevis`.
+
+## Screenshot
+![Screenshot of the Crevis UI](docs/crevis.png)
