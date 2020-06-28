@@ -20,9 +20,10 @@ class Mesh : public QObject
 
         void addTriangle(Triangle triangle);
         void scale(double factor);
-        void rotateX(double angle);
-        void rotateY(double angle);
-        void rotateZ(double angle);
+
+        double getAngleX(void); // returns x rotation in degrees
+        double getAngleY(void); // returns y rotation in degrees
+        double getAngleZ(void); // returns z rotation in degrees
         
         static Mesh* cube(void);
 
@@ -33,6 +34,11 @@ class Mesh : public QObject
 
     signals:
         void changed(void);
+
+    public slots:
+        void setXRotation(double deg);
+        void setYRotation(double deg);
+        void setZRotation(double deg);
 };
 
 

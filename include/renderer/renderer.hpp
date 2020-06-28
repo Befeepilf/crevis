@@ -38,11 +38,6 @@ class Renderer : public QObject
         void setSize(int newWidth, int newHeight);
         void createCube(void);
         void setFocalLen(double newFocalLen);
-        void setSelectedMesh(Mesh* mesh);
-
-        void setXRotOfSelectedMesh(double angle);
-        void setYRotOfSelectedMesh(double angle);
-        void setZRotOfSelectedMesh(double angle);
 
         void render();
 

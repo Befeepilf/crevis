@@ -43,7 +43,6 @@ void Renderer::addMesh(Mesh* mesh)
 void Renderer::createCube()
 {
     Mesh* cube = Mesh::cube();
-    cube->rotateZ(3.14 / 2);
     addMesh(cube);
 }
 
@@ -53,38 +52,6 @@ void Renderer::setFocalLen(double newFocalLen)
     focalLen = newFocalLen / 200;
     render();
 }
-
-void Renderer::setSelectedMesh(Mesh* mesh)
-{
-    std::cout << "Set selected mesh to " << mesh->name << std::endl;
-    selectedMesh = mesh;
-}
-
-
-void Renderer::setXRotOfSelectedMesh(double angle)
-{
-    if (selectedMesh != nullptr)
-    {
-        selectedMesh->rotateX(angle / 100);
-    }
-}
-
-void Renderer::setYRotOfSelectedMesh(double angle)
-{
-    if (selectedMesh != nullptr)
-    {
-        selectedMesh->rotateY(angle / 100);
-    }
-}
-
-void Renderer::setZRotOfSelectedMesh(double angle)
-{
-    if (selectedMesh != nullptr)
-    {
-        selectedMesh->rotateZ(angle / 100);
-    }
-}
-
 
 void Renderer::drawLine(Vec2d p1, Vec2d p2)
 {

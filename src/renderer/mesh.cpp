@@ -1,3 +1,4 @@
+#include "math/trig.hpp"
 #include "renderer/mesh.hpp"
 #include "renderer/triangle.hpp"
 
@@ -27,9 +28,10 @@ void Mesh::scale(double factor)
     emit changed();
 }
 
-void Mesh::rotateX(double angle)
+void Mesh::setXRotation(double deg)
 {
-    double angleChange = angle - angleX;
+    double rad = degToRad(deg);
+    double angleChange = rad - angleX;
 
     for (unsigned int t = 0; t < triangles.size(); t++)
     {
@@ -38,14 +40,15 @@ void Mesh::rotateX(double angle)
         triangles[t].p3.rotateX(angleChange);
     }
 
-    angleX = angle;
+    angleX = rad;
 
     emit changed();
 }
 
-void Mesh::rotateY(double angle)
+void Mesh::setYRotation(double deg)
 {
-    double angleChange = angle - angleY;
+    double rad = degToRad(deg);
+    double angleChange = rad - angleY;
 
     for (unsigned int t = 0; t < triangles.size(); t++)
     {
@@ -54,14 +57,15 @@ void Mesh::rotateY(double angle)
         triangles[t].p3.rotateY(angleChange);
     }
 
-    angleY = angle;
+    angleY = rad;
 
     emit changed();
 }
 
-void Mesh::rotateZ(double angle)
+void Mesh::setZRotation(double deg)
 {
-    double angleChange = angle - angleZ;
+    double rad = degToRad(deg);
+    double angleChange = rad - angleZ;
 
     for (unsigned int t = 0; t < triangles.size(); t++)
     {
@@ -70,11 +74,25 @@ void Mesh::rotateZ(double angle)
         triangles[t].p3.rotateZ(angleChange);
     }
 
-    angleZ = angle;
+    angleZ = rad;
 
     emit changed();
 }
 
+double Mesh::getAngleX()
+{
+    return radToDeg(angleX);
+}
+
+double Mesh::getAngleY()
+{
+    return radToDeg(angleY);
+}
+
+double Mesh::getAngleZ()
+{
+    return radToDeg(angleZ);
+}
 
 Mesh* Mesh::cube()
 {

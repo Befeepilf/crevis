@@ -12,9 +12,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 
 HEADERS += include/gui/canvas.hpp \
+           include/gui/meshProperties.hpp \
            include/gui/meshesList.hpp \
            include/gui/meshesListItem.hpp \
            include/gui/window.hpp \
+           include/math/trig.hpp \
            include/renderer/mesh.hpp \
            include/renderer/renderer.hpp \
            include/renderer/triangle.hpp \
@@ -24,9 +26,11 @@ HEADERS += include/gui/canvas.hpp \
 
 SOURCES += src/main.cpp \
            src/gui/canvas.cpp \
+           src/gui/meshProperties.cpp \
            src/gui/meshesList.cpp \
            src/gui/meshesListItem.cpp \
            src/gui/window.cpp \
+           src/math/trig.cpp \
            src/renderer/mesh.cpp \
            src/renderer/renderer.cpp \
            src/renderer/triangle.cpp \
