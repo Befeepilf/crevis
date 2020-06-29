@@ -6,9 +6,18 @@
 class Vec3d : public Vec2d
 {
     public:
-        Vec3d(double x, double y, double z);
+        Vec3d(const double x, const double y, const double z);
         double z(void);
-        void rotateZ(double angle);
+        void rotateZ(const double angle);
+
+        // operator overload: add two vectors
+        Vec3d operator+(Vec3d v);
+        // operator overload: substract two vectors
+        Vec3d operator-(Vec3d v);
+        // operator overload: scale copy of this vector
+        Vec3d operator*(const double s);
+        // operator overload: scale copy of this vector
+        Vec3d operator/(const double s);
 };
 
 #endif // THREE_D_VECTOR_H

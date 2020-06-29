@@ -11,14 +11,8 @@ class Vec
 
         std::vector<double> components;
 
-        // operator overload: add two vectors
-        Vec operator+(const Vec v);
-
-        // operator overload: scale copy of this vector
-        Vec operator*(const double s);
         // operator overload: scale this vector
-        Vec operator*=(const double s);
-
+        void operator*=(const double s);
         // operator overload: dot product
         double operator*(const Vec v);
 };

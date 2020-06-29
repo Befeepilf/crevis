@@ -25,41 +25,14 @@ double Vec::length()
     return sqrt(sum);
 }
 
-// operator overload: add two vectors
-Vec Vec::operator+(Vec v)
-{
-    Vec new_v (components);
-
-    for (unsigned int i = 0; i < v.components.size(); i++)
-    {
-        new_v.components[i] += v.components[i];
-    }
-
-    return new_v;
-}
-
-// operator overload: scale copy of this vector
-Vec Vec::operator*(double s)
-{
-    Vec new_v (components);
-
-    for (unsigned int i = 0; i < new_v.components.size(); i++)
-    {
-        new_v.components[i] *= s;
-    }
-
-    return new_v;
-}
 
 // operator overload: scale this vector
-Vec Vec::operator*=(double s)
+void Vec::operator*=(const double s)
 {
     for (unsigned int i = 0; i < components.size(); i++)
     {
         components[i] *= s;
     }
-
-    return *this;
 }
 
 // operator overload: dot product
