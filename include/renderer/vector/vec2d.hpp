@@ -22,4 +22,7 @@ class Vec2d : public Vec
         Vec2d operator/(const double s);
 };
 
+
+double perpDot(Vec2d v1, Vec2d v2);
+
 #endif // TWO_D_VECTOR_H

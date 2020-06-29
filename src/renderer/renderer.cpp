@@ -6,6 +6,7 @@
 #include <QColor>
 #include <QImage>
 
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
@@ -66,10 +67,7 @@ void Renderer::drawLine(Vec2d p1, Vec2d p2, QColor color)
         const int pixelX = round(p1.x() + currLen * (p2.x() - p1.x()) / len);
         const int pixelY = round(p1.y() + currLen * (p2.y() - p1.y()) / len);
 
-        if (pixelX < width && pixelX >= 0 && pixelY < height && pixelY >= 0)
-        {
-            image->setPixelColor(pixelX, pixelY, color);
-        }
+        image->setPixelColor(pixelX, pixelY, color);
 
         currLen++;
     }
@@ -77,31 +75,53 @@ void Renderer::drawLine(Vec2d p1, Vec2d p2, QColor color)
 
 void Renderer::fillTriangle(Vec2d p1, Vec2d p2, Vec2d p3, QColor color)
 {
-    // calculate side lengths
-    // define p1 -> p2 as base
-    Vec2d s1 = (p3 - p1);
-    Vec2d s2 = (p3 - p2);
+    // calculate two side lengths spanning a plane
+    Vec2d s1 = (p2 - p1);
+    Vec2d s2 = (p3 - p1);
+
+    // find bounding box of triangle
+    double xMin = std::min(p1.x(), std::min(p2.x(), p3.x()));
+    double xMax = std::max(p1.x(), std::max(p2.x(), p3.x()));
+    double yMin = std::min(p1.y(), std::min(p2.y(), p3.y()));
+    double yMax = std::max(p1.y(), std::max(p2.y(), p3.y()));
     
-    double bLen = (p2 - p1).length();
-    double s1Len = s1.length();
-    double s2Len = s2.length();
+    /*
+        Using Barycentric coordinates to determine whether
+        a point liesinside the triangle:
 
-    Vec2d s1Norm = s1 / s1Len;
-    Vec2d s2Norm = s2 / s2Len;
+        P(a, b) = p1 + a * s1 + b * s2
+        where a, b >= 0 and (a + b) <= 1
+        describes all points inside the triangle
 
-    // calculate height of triangle
-    double height = sqrt(pow(s2Len, 2) - (pow(bLen, 2) - pow(s1Len, 2) + pow(s2Len, 2)) / (2 * bLen));
+        equation to solve:
+            P - p1 = a * s1 + b * s2
 
-    double currHeight = 0;
-    while (currHeight < height)
-    {
-        Vec2d lineStart = p1 + s1Norm * s1Len / height * currHeight;
-        Vec2d lineEnd = p2 + s2Norm * s2Len / height * currHeight;
-        drawLine(lineStart, lineEnd, color);
-        
-        // go half steps to make sure not pixel is left out
-        currHeight += 0.5;
-    }
+        -> use Cramer's rule
+    */
+
+   for (unsigned int x = xMin; x <= xMax; x++)
+   {
+       for (unsigned int y = yMin; y <= yMax; y++)
+       {
+            Vec2d P (x - p1.x(), y - p1.y());
+
+            /*
+                Cramer's rule
+                the perp dot product of two 2d vectors is equivalent
+                to the determinant of a 2x2 matrix where its columns
+                are these two vectors
+            */
+            double fac = 1 / perpDot(s1, s2);
+            double a = perpDot(P, s2) * fac;
+            double b = perpDot(s1, P) * fac;
+
+            // if point is inside triangle, draw it
+            if (a >= 0 && b >= 0 && (a + b) <= 1)
+            {
+                image->setPixelColor(x, y, color);
+            }
+       }
+   }
 }
 
 Vec2d Renderer::projectVec3d(Vec3d v)

@@ -59,3 +59,9 @@ Vec2d Vec2d::operator/(const double s)
 {
     return Vec2d(x() / s, y() / s);
 }
+
+
+double perpDot(Vec2d v1, Vec2d v2)
+{
+    return v1.x() * v2.y() - v1.y() * v2.x();
+}
