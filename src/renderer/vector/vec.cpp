@@ -24,13 +24,3 @@ double Vec::length()
 
     return sqrt(sum);
 }
-
-
-// operator overload: scale this vector
-void Vec::operator*=(const double s)
-{
-    for (unsigned int i = 0; i < components.size(); i++)
-    {
-        components[i] *= s;
-    }
-}

@@ -13,14 +13,25 @@ class Vec3d : public Vec2d
 
         // operator overload: add two vectors
         Vec3d operator+(Vec3d v);
+        // operator overload: add a vector to this vector
+        Vec3d& operator+=(Vec3d& v);
+
         // operator overload: substract two vectors
         Vec3d operator-(Vec3d v);
+        // operator overload: substract a vector from this vector
+        Vec3d& operator-=(Vec3d& v);
+
         // operator overload: scale copy of this vector
         Vec3d operator*(const double s);
+        // operator overload: scale his vector
+        Vec3d& operator*=(const double s);
         // operator overload: dot product
         double operator*(Vec3d v);
+
         // operator overload: scale copy of this vector
         Vec3d operator/(const double s);
+        // operator overload: scale this vector
+        Vec3d& operator/=(const double s);
 };
 
 Vec3d crossProd(Vec3d v1, Vec3d v2);

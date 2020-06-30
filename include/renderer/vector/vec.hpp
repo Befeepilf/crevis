@@ -10,9 +10,6 @@ class Vec
         double length(void);
 
         std::vector<double> components;
-
-        // operator overload: scale this vector
-        void operator*=(const double s);
 };
 
 #endif // VECTOR_H

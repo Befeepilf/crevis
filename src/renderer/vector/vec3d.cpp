@@ -35,16 +35,46 @@ Vec3d Vec3d::operator+(Vec3d v)
     return Vec3d(x() + v.x(), y() + v.y(), z() + v.z());
 }
 
+// operator overload: add a vector to this vector
+Vec3d& Vec3d::operator+=(Vec3d& v)
+{
+    components[0] += v.x();
+    components[1] += v.y();
+    components[2] += v.z();
+
+    return *this;
+}
+
 // operator overload: substract two vectors
 Vec3d Vec3d::operator-(Vec3d v)
 {
     return Vec3d(x() - v.x(), y() - v.y(), z() - v.z());
 }
 
+// operator overload: substract a vector from this vector
+Vec3d& Vec3d::operator-=(Vec3d& v)
+{
+    components[0] -= v.x();
+    components[1] -= v.y();
+    components[2] -= v.z();
+
+    return *this;
+}
+
 // operator overload: scale copy of this vector
 Vec3d Vec3d::operator*(const double s)
 {
     return Vec3d(x() * s, y() * s, z() * s);
+}
+
+// operator overload: scale his vector
+Vec3d& Vec3d::operator*=(const double s)
+{
+    components[0] *= s;
+    components[1] *= s;
+    components[2] *= s;
+
+    return *this;
 }
 
 // operator overload: dot product
@@ -57,6 +87,16 @@ double Vec3d::operator*(Vec3d v)
 Vec3d Vec3d::operator/(const double s)
 {
     return Vec3d(x() / s, y() / s, z() * s);
+}
+
+// operator overload: scale this vector
+Vec3d& Vec3d::operator/=(const double s)
+{
+    components[0] /= s;
+    components[1] /= s;
+    components[2] /= s;
+
+    return *this;
 }
 
 

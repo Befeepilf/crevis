@@ -32,6 +32,10 @@ class Mesh : public QObject
         static Mesh* cube(void);
 
     private:
+        void calcCenter(void);
+
+        Vec3d* center;
+
         double angleX;
         double angleY;
         double angleZ;

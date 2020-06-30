@@ -13,11 +13,33 @@ Mesh::Mesh(const char* name, std::vector<Triangle> triangles) : name(name), tria
     translateX = 0;
     translateY = 0;
     translateZ = 0;
+
+    center = new Vec3d(0, 0, 0);
+    calcCenter();
+}
+
+void Mesh::calcCenter()
+{
+    Vec3d newCenter (0, 0, 0);
+
+    for (Triangle t : triangles)
+    {
+        newCenter += t.p1;
+        newCenter += t.p2;
+        newCenter += t.p3;
+    }
+
+    newCenter /= triangles.size() * 3;
+
+    center->components[0] = newCenter.x();
+    center->components[1] = newCenter.y();
+    center->components[2] = newCenter.z();
 }
 
 void Mesh::addTriangle(Triangle triangle)
 {
     triangles.push_back(triangle);
+    calcCenter();
 }
 
 void Mesh::scale(double factor)
@@ -39,9 +61,17 @@ void Mesh::setXRotation(double deg)
 
     for (unsigned int t = 0; t < triangles.size(); t++)
     {
+        triangles[t].p1 -= *center;
+        triangles[t].p2 -= *center;
+        triangles[t].p3 -= *center;
+
         triangles[t].p1.rotateX(angleChange);
         triangles[t].p2.rotateX(angleChange);
         triangles[t].p3.rotateX(angleChange);
+
+        triangles[t].p1 += *center;
+        triangles[t].p2 += *center;
+        triangles[t].p3 += *center;
     }
 
     angleX = rad;
@@ -56,9 +86,17 @@ void Mesh::setYRotation(double deg)
 
     for (unsigned int t = 0; t < triangles.size(); t++)
     {
+        triangles[t].p1 -= *center;
+        triangles[t].p2 -= *center;
+        triangles[t].p3 -= *center;
+
         triangles[t].p1.rotateY(angleChange);
         triangles[t].p2.rotateY(angleChange);
         triangles[t].p3.rotateY(angleChange);
+
+        triangles[t].p1 += *center;
+        triangles[t].p2 += *center;
+        triangles[t].p3 += *center;
     }
 
     angleY = rad;
@@ -73,9 +111,17 @@ void Mesh::setZRotation(double deg)
 
     for (unsigned int t = 0; t < triangles.size(); t++)
     {
+        triangles[t].p1 -= *center;
+        triangles[t].p2 -= *center;
+        triangles[t].p3 -= *center;
+
         triangles[t].p1.rotateZ(angleChange);
         triangles[t].p2.rotateZ(angleChange);
         triangles[t].p3.rotateZ(angleChange);
+
+        triangles[t].p1 += *center;
+        triangles[t].p2 += *center;
+        triangles[t].p3 += *center;
     }
 
     angleZ = rad;
@@ -97,6 +143,8 @@ void Mesh::setXTranslation(double newTranslateX)
 
     translateX = newTranslateX;
 
+    calcCenter();
+
     emit changed();
 }
 
@@ -113,6 +161,8 @@ void Mesh::setYTranslation(double newTranslateY)
 
     translateY = newTranslateY;
 
+    calcCenter();
+
     emit changed();
 }
 
@@ -128,6 +178,8 @@ void Mesh::setZTranslation(double newTranslateZ)
     }
 
     translateZ = newTranslateZ;
+
+    calcCenter();
 
     emit changed();
 }
