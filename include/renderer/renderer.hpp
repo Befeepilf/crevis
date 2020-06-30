@@ -26,7 +26,6 @@ class Renderer : public QObject
     private:
         unsigned int width;
         unsigned int height;
-        double aspectRatio;
         double focalLen;
         std::vector<Mesh*> meshes;
         Mesh* selectedMesh;
@@ -46,6 +45,7 @@ class Renderer : public QObject
 
     signals:
         void renderedFrame(QImage img);
+        void fps(unsigned int fps);
         void focalLenChanged(double focalLen);
         void addedMesh(Mesh* mesh);
 };

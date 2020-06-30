@@ -7,6 +7,7 @@
 #include <QImage>
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <iostream>
 #include <vector>
@@ -16,7 +17,6 @@ Renderer::Renderer(std::vector<Mesh*> meshes) : meshes(meshes)
 {
     width = 200;
     height = 200;
-    aspectRatio = height / width;
     focalLen = 0.5;
 
     cameraPos = new Vec3d(0, 0, -focalLen);
@@ -31,7 +31,6 @@ void Renderer::setSize(int newWidth, int newHeight)
 {
     width = newWidth;
     height = newHeight;
-    aspectRatio = (double) height / (double) width;
 
     render();
 }
@@ -136,20 +135,18 @@ void Renderer::fillTriangle(Vec2d p1, Vec2d p2, Vec2d p3, QColor color)
 
 Vec2d Renderer::projectVec3d(Vec3d v)
 {
-    // tan (a) = 0.5 / focalLen => 1 / tan(a) = focalLen / 0.5
-    double fovCorrW = focalLen / 0.5;
-    // tan (b) = 0.5 / focalLen => 1 / tan(b) = focalLen / 0.5
-    double fovCorrH = focalLen / 0.5;
+    double corr = height * focalLen / (v.z() + focalLen);
 
-
-    int x = width/2 * v.x() * fovCorrW * aspectRatio / (v.z() + focalLen) + width/2;
-    int y = height/2 * v.y() * fovCorrH / (v.z() + focalLen) + height/2;
+    int x = v.x() * corr + width/2;
+    int y = v.y() * corr + height/2;
 
     return Vec2d(x, y);
 }
 
 void Renderer::render()
 {
+    auto renderStart = std::chrono::high_resolution_clock::now();
+
     image = new QImage(width, height, QImage::Format_RGB32);
 
     std::vector<Triangle> triangles;
@@ -221,4 +218,9 @@ void Renderer::render()
     }
 
     emit renderedFrame(*image);
+
+    auto renderEnd = std::chrono::high_resolution_clock::now();
+    auto renderTime = std::chrono::duration_cast<std::chrono::microseconds>(renderEnd - renderStart).count();
+
+    emit fps(1000000 / renderTime);
 }

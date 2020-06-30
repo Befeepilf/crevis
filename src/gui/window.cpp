@@ -7,6 +7,7 @@
 
 #include <QAction>
 #include <QDockWidget>
+#include <QLabel>
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QStatusBar>
@@ -45,6 +46,7 @@ Window::Window(QWidget* parent) : QMainWindow(parent), renderer(new Renderer)
     selectedMeshPropertiesContainer->widget()->hide();
     addDockWidget(Qt::RightDockWidgetArea, selectedMeshPropertiesContainer);
 
+    // notify selectedMeshProperties whenever a Mesh is selected
     connect(meshesListWidget, &MeshesList::selectedMesh, selectedMeshProperties, &MeshProperties::setMesh);
 
 
@@ -74,6 +76,10 @@ void Window::createToolbar()
     connect(focalLenSlider, &QSlider::valueChanged, renderer, &Renderer::setFocalLen);
     connect(renderer, &Renderer::focalLenChanged, focalLenSlider, &QSlider::setValue);
     toolbar->addWidget(focalLenSlider);
+
+    QLabel* fpsLabel = new QLabel;
+    connect(renderer, &Renderer::fps, fpsLabel, qOverload<int>(&QLabel::setNum));
+    toolbar->addWidget(fpsLabel);
 }
 
 void Window::showStatus(char* msg)
