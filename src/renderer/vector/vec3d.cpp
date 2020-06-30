@@ -23,6 +23,12 @@ void Vec3d::rotateZ(const double angle)
 }
 
 
+void Vec3d::translateZ(const double amount)
+{
+    components[2] += amount;
+}
+
+
 // operator overload: add two vectors
 Vec3d Vec3d::operator+(Vec3d v)
 {
@@ -41,8 +47,24 @@ Vec3d Vec3d::operator*(const double s)
     return Vec3d(x() * s, y() * s, z() * s);
 }
 
+// operator overload: dot product
+double Vec3d::operator*(Vec3d v)
+{
+    return x() * v.x() + y() * v.y() + z() * v.z();
+}
+
 // operator overload: scale copy of this vector
 Vec3d Vec3d::operator/(const double s)
 {
     return Vec3d(x() / s, y() / s, z() * s);
+}
+
+
+Vec3d crossProd(Vec3d v1, Vec3d v2)
+{
+    return Vec3d(
+        v1.y() * v2.z() - v1.z() * v2.y(),
+        v1.z() * v2.x() - v1.x() * v2.z(),
+        v1.x() * v2.y() - v1.y() * v2.x()
+    );
 }

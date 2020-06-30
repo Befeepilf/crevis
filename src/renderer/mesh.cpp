@@ -9,6 +9,10 @@ Mesh::Mesh(const char* name, std::vector<Triangle> triangles) : name(name), tria
     angleX = 0;
     angleY = 0;
     angleZ = 0;
+
+    translateX = 0;
+    translateY = 0;
+    translateZ = 0;
 }
 
 void Mesh::addTriangle(Triangle triangle)
@@ -79,6 +83,56 @@ void Mesh::setZRotation(double deg)
     emit changed();
 }
 
+
+void Mesh::setXTranslation(double newTranslateX)
+{
+    double translateChange = newTranslateX - translateX;
+
+    for (unsigned int t = 0; t < triangles.size(); t++)
+    {
+        triangles[t].p1.translateX(translateChange);
+        triangles[t].p2.translateX(translateChange);
+        triangles[t].p3.translateX(translateChange);
+    }
+
+    translateX = newTranslateX;
+
+    emit changed();
+}
+
+void Mesh::setYTranslation(double newTranslateY)
+{
+    double translateChange = newTranslateY - translateY;
+
+    for (unsigned int t = 0; t < triangles.size(); t++)
+    {
+        triangles[t].p1.translateY(translateChange);
+        triangles[t].p2.translateY(translateChange);
+        triangles[t].p3.translateY(translateChange);
+    }
+
+    translateY = newTranslateY;
+
+    emit changed();
+}
+
+void Mesh::setZTranslation(double newTranslateZ)
+{
+    double translateChange = newTranslateZ - translateZ;
+
+    for (unsigned int t = 0; t < triangles.size(); t++)
+    {
+        triangles[t].p1.translateZ(translateChange);
+        triangles[t].p2.translateZ(translateChange);
+        triangles[t].p3.translateZ(translateChange);
+    }
+
+    translateZ = newTranslateZ;
+
+    emit changed();
+}
+
+
 double Mesh::getAngleX()
 {
     return radToDeg(angleX);
@@ -94,6 +148,23 @@ double Mesh::getAngleZ()
     return radToDeg(angleZ);
 }
 
+
+double Mesh::getTranslationX()
+{
+    return translateX;
+}
+
+double Mesh::getTranslationY()
+{
+    return translateY;
+}
+
+double Mesh::getTranslationZ()
+{
+    return translateZ;
+}
+
+
 Mesh* Mesh::cube()
 {
     return new Mesh("Cube", {
@@ -104,16 +175,16 @@ Mesh* Mesh::cube()
         Triangle({0, 1, 0}, {0, 1, 1}, {1, 1, 0}),
         Triangle({1, 1, 0}, {0, 1, 1}, {1, 1, 1}),
         // back face
-        Triangle({0, 0, 1}, {0, 1, 1}, {1, 0, 1}),
-        Triangle({1, 0, 1}, {0, 1, 1}, {1, 1, 1}),
-        // top face
-        Triangle({0, 0, 0}, {0, 0, 1}, {1, 0, 0}),
-        Triangle({1, 0, 0}, {0, 0, 1}, {1, 0, 1}),
+        Triangle({1, 0, 1}, {0, 1, 1}, {0, 0, 1}),
+        Triangle({1, 1, 1}, {0, 1, 1}, {1, 0, 1}),
+        // top face (anti-clockwise)
+        Triangle({1, 0, 0}, {0, 0, 1}, {0, 0, 0}),
+        Triangle({1, 0, 1}, {0, 0, 1}, {1, 0, 0}),
         // left face
         Triangle({0, 0, 1}, {0, 1, 1}, {0, 0, 0}),
         Triangle({0, 0, 0}, {0, 1, 1}, {0, 1, 0}),
-        // right face
-        Triangle({1, 0, 0}, {1, 0, 1}, {1, 1, 0}),
-        Triangle({1, 1, 0}, {1, 1, 1}, {1, 0, 1})
+        // right face (anti-clockwise)
+        Triangle({1, 0, 1}, {1, 0, 0}, {1, 1, 0}),
+        Triangle({1, 1, 0}, {1, 0, 1}, {1, 1, 1})
     });
 }

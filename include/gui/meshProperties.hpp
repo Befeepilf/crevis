@@ -4,7 +4,7 @@
 
 #include "renderer/mesh.hpp"
 
-#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QSlider>
 #include <QWidget>
 
@@ -17,10 +17,18 @@ class MeshProperties : public QWidget
         explicit MeshProperties(QWidget* parent = 0);
 
     private:
-        QHBoxLayout* layout;
+        void createRotationSliders(void);
+        void createTranslationSliders(void);
+
+        QVBoxLayout* layout;
+
         QSlider* rotXSlider;
         QSlider* rotYSlider;
         QSlider* rotZSlider;
+
+        QSlider* translateXSlider;
+        QSlider* translateYSlider;
+        QSlider* translateZSlider;
 
         Mesh* mesh;
 

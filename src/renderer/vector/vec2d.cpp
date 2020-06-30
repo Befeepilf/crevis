@@ -36,6 +36,17 @@ void Vec2d::rotateY(const double angle)
 }
 
 
+void Vec2d::translateX(const double amount)
+{
+    components[0] += amount;
+}
+
+void Vec2d::translateY(const double amount)
+{
+    components[1] += amount;
+}
+
+
 // operator overload: add two vectors
 Vec2d Vec2d::operator+(Vec2d v)
 {

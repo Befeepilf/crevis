@@ -31,6 +31,7 @@ class Renderer : public QObject
         std::vector<Mesh*> meshes;
         Mesh* selectedMesh;
         QImage* image;
+        Vec3d* cameraPos;
 
         Vec2d projectVec3d(Vec3d v);
         void drawLine(Vec2d p1, Vec2d p2, QColor color);

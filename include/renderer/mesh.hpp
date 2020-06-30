@@ -25,12 +25,20 @@ class Mesh : public QObject
         double getAngleY(void); // returns y rotation in degrees
         double getAngleZ(void); // returns z rotation in degrees
         
+        double getTranslationX(void);
+        double getTranslationY(void);
+        double getTranslationZ(void);
+
         static Mesh* cube(void);
 
     private:
         double angleX;
         double angleY;
         double angleZ;
+
+        double translateX;
+        double translateY;
+        double translateZ;
 
     signals:
         void changed(void);
@@ -39,6 +47,10 @@ class Mesh : public QObject
         void setXRotation(double deg);
         void setYRotation(double deg);
         void setZRotation(double deg);
+
+        void setXTranslation(double newTranslateX);
+        void setYTranslation(double newTranslateY);
+        void setZTranslation(double newTranslateZ);
 };
 
 

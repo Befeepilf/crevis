@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <vector>
 
 
@@ -17,6 +18,8 @@ Renderer::Renderer(std::vector<Mesh*> meshes) : meshes(meshes)
     height = 200;
     aspectRatio = height / width;
     focalLen = 0.5;
+
+    cameraPos = new Vec3d(0, 0, -focalLen);
 }
 
 double Renderer::getFocalLen()
@@ -51,6 +54,7 @@ void Renderer::setFocalLen(double newFocalLen)
 {
     if (newFocalLen != focalLen) emit focalLenChanged(newFocalLen);
     focalLen = newFocalLen / 200;
+    cameraPos->components[2] = -focalLen;
     render();
 }
 
@@ -67,7 +71,10 @@ void Renderer::drawLine(Vec2d p1, Vec2d p2, QColor color)
         const int pixelX = round(p1.x() + currLen * (p2.x() - p1.x()) / len);
         const int pixelY = round(p1.y() + currLen * (p2.y() - p1.y()) / len);
 
-        image->setPixelColor(pixelX, pixelY, color);
+        if (pixelX >= 0 && pixelX < width && pixelY >= 0 && pixelY < height)
+        {
+            image->setPixelColor(pixelX, pixelY, color);
+        }
 
         currLen++;
     }
@@ -118,7 +125,10 @@ void Renderer::fillTriangle(Vec2d p1, Vec2d p2, Vec2d p3, QColor color)
             // if point is inside triangle, draw it
             if (a >= 0 && b >= 0 && (a + b) <= 1)
             {
-                image->setPixelColor(x, y, color);
+                if (x >= 0 && x < width && y >= 0 && y < height)
+                {
+                    image->setPixelColor(x, y, color);
+                }
             }
        }
    }
@@ -139,23 +149,73 @@ void Renderer::render()
 {
     image = new QImage(width, height, QImage::Format_RGB32);
 
+    std::vector<Triangle> triangles;
+
+    // collect all triangles in a single vector sorted by avgZ
+    // to paint farthest triangles first
     for (Mesh* m : meshes)
     {
         for (Triangle t : m->triangles)
         {
-            // 3D projection
-            Vec2d p1Proj = projectVec3d(t.p1);
-            Vec2d p2Proj = projectVec3d(t.p2);
-            Vec2d p3Proj = projectVec3d(t.p3);
+            // Vec3d normalVec = crossProd(t.p2 - t.p1, t.p3 - t.p1);
+            // Vec3d viewDir = t.p1 - *cameraPos;
 
-            // fill projected triangle
-            fillTriangle(p1Proj, p2Proj, p3Proj, Qt::gray);
+            // std::cout << "l1: " << (t.p2 - t.p1).x() << ", " << (t.p2 - t.p1).y() << ", " << (t.p2 - t.p1).z() << std::endl;
+            // std::cout << "l2: " << (t.p3 - t.p1).x() << ", " << (t.p3 - t.p1).y() << ", " << (t.p3 - t.p1).z() << std::endl;
+            // std::cout << "normal: " << normalVec.x() << ", " << normalVec.y() << ", " << normalVec.z() << std::endl;
+            // std::cout << "view: " << viewDir.x() << ", " << viewDir.y() << ", " << viewDir.z() << std::endl;
+            // std::cout << "-> " << normalVec * viewDir << std::endl;
 
-            // draw outlines of projected triangle
-            drawLine(p1Proj, p2Proj, Qt::red);
-            drawLine(p2Proj, p3Proj, Qt::red);
-            drawLine(p3Proj, p1Proj, Qt::red);
+            // filter out triangles not facing the camera
+            if (/*normalVec * viewDir < 0 || */1)
+            {
+                if (triangles.size() > 0)
+                {
+                    int l = 0;
+                    int r = triangles.size() - 1;
+                    unsigned int m;
+
+                    while (l <= r)
+                    {
+                        m = l + (r - l) / 2;
+                        if (triangles[m].avgZ < t.avgZ)
+                        {
+                            r = m - 1;
+                        }
+                        else if (triangles[m].avgZ > t.avgZ)
+                        {
+                            l = m + 1;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    triangles.insert(triangles.begin() + m, t);
+                }
+                else
+                {
+                    triangles.push_back(t);
+                }
+            }
         }
+    }
+
+    for (Triangle t : triangles)
+    {
+        // 3D projection
+        Vec2d p1Proj = projectVec3d(t.p1);
+        Vec2d p2Proj = projectVec3d(t.p2);
+        Vec2d p3Proj = projectVec3d(t.p3);
+
+        // fill projected triangle
+        fillTriangle(p1Proj, p2Proj, p3Proj, Qt::gray);
+
+        // draw outlines of projected triangle
+        drawLine(p1Proj, p2Proj, Qt::red);
+        drawLine(p2Proj, p3Proj, Qt::red);
+        drawLine(p3Proj, p1Proj, Qt::red);
     }
 
     emit renderedFrame(*image);

@@ -34,16 +34,3 @@ void Vec::operator*=(const double s)
         components[i] *= s;
     }
 }
-
-// operator overload: dot product
-double Vec::operator*(Vec v)
-{
-    double sum = 0;
-
-    for (unsigned int i = 0; i < components.size(); i++)
-    {
-        sum += components[i] * v.components[i];
-    }
-
-    return sum;
-}

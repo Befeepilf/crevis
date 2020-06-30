@@ -13,8 +13,6 @@ class Vec
 
         // operator overload: scale this vector
         void operator*=(const double s);
-        // operator overload: dot product
-        double operator*(const Vec v);
 };
 
 #endif // VECTOR_H

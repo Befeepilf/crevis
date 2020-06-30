@@ -10,6 +10,8 @@ class Triangle
         Vec3d p1;
         Vec3d p2;
         Vec3d p3;
+
+        double avgZ;
 };
 
 #endif // TRIANGLE_H

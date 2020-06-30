@@ -9,8 +9,10 @@ class Vec2d : public Vec
         Vec2d(const double x, const double y);
         double x(void);
         double y(void);
-        void rotateY(const double angle);
         void rotateX(const double angle);
+        void rotateY(const double angle);
+        void translateX(const double amount);
+        void translateY(const double amount);
 
         // operator overload: add two vectors
         Vec2d operator+(Vec2d v);
