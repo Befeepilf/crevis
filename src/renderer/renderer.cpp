@@ -136,11 +136,14 @@ void Renderer::fillTriangle(Vec2d p1, Vec2d p2, Vec2d p3, QColor color)
 
 Vec2d Renderer::projectVec3d(Vec3d v)
 {
+    // tan (a) = 0.5 / focalLen => 1 / tan(a) = focalLen / 0.5
     double fovCorrW = focalLen / 0.5;
+    // tan (b) = 0.5 / focalLen => 1 / tan(b) = focalLen / 0.5
     double fovCorrH = focalLen / 0.5;
 
-    int x = width/2 * v.x() * fovCorrW * aspectRatio / (v.z() + 1 + focalLen) + width/2;
-    int y = height/2 * v.y() * fovCorrH / (v.z() + 1 + focalLen) + height/2;
+
+    int x = width/2 * v.x() * fovCorrW * aspectRatio / (v.z() + focalLen) + width/2;
+    int y = height/2 * v.y() * fovCorrH / (v.z() + focalLen) + height/2;
 
     return Vec2d(x, y);
 }
@@ -157,17 +160,11 @@ void Renderer::render()
     {
         for (Triangle t : m->triangles)
         {
-            // Vec3d normalVec = crossProd(t.p2 - t.p1, t.p3 - t.p1);
-            // Vec3d viewDir = t.p1 - *cameraPos;
-
-            // std::cout << "l1: " << (t.p2 - t.p1).x() << ", " << (t.p2 - t.p1).y() << ", " << (t.p2 - t.p1).z() << std::endl;
-            // std::cout << "l2: " << (t.p3 - t.p1).x() << ", " << (t.p3 - t.p1).y() << ", " << (t.p3 - t.p1).z() << std::endl;
-            // std::cout << "normal: " << normalVec.x() << ", " << normalVec.y() << ", " << normalVec.z() << std::endl;
-            // std::cout << "view: " << viewDir.x() << ", " << viewDir.y() << ", " << viewDir.z() << std::endl;
-            // std::cout << "-> " << normalVec * viewDir << std::endl;
+            Vec3d normalVec = crossProd(t.p2 - t.p1, t.p3 - t.p1);
+            Vec3d viewDir = t.p1 - *cameraPos;
 
             // filter out triangles not facing the camera
-            if (/*normalVec * viewDir < 0 || */1)
+            if (normalVec * viewDir < 0)
             {
                 if (triangles.size() > 0)
                 {

@@ -237,6 +237,6 @@ Mesh* Mesh::cube()
         Triangle({0, 0, 0}, {0, 1, 1}, {0, 1, 0}),
         // right face (anti-clockwise)
         Triangle({1, 0, 1}, {1, 0, 0}, {1, 1, 0}),
-        Triangle({1, 1, 0}, {1, 0, 1}, {1, 1, 1})
+        Triangle({1, 1, 1}, {1, 0, 1}, {1, 1, 0})
     });
 }
