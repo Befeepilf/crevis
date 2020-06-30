@@ -153,6 +153,7 @@ void Renderer::render()
     image = new QImage(width, height, QImage::Format_RGB32);
 
     std::vector<Triangle> triangles;
+    std::vector<double> triangleFaceDirections; // keep track of how much the triangle faces the camera
 
     // collect all triangles in a single vector sorted by avgZ
     // to paint farthest triangles first
@@ -162,9 +163,10 @@ void Renderer::render()
         {
             Vec3d normalVec = crossProd(t.p2 - t.p1, t.p3 - t.p1);
             Vec3d viewDir = t.p1 - *cameraPos;
+            double faceDirection = normalVec * viewDir;
 
             // filter out triangles not facing the camera
-            if (normalVec * viewDir < 0)
+            if (faceDirection < 0)
             {
                 if (triangles.size() > 0)
                 {
@@ -190,24 +192,27 @@ void Renderer::render()
                     }
 
                     triangles.insert(triangles.begin() + m, t);
+                    triangleFaceDirections.insert(triangleFaceDirections.begin() + m, faceDirection);
                 }
                 else
                 {
                     triangles.push_back(t);
+                    triangleFaceDirections.push_back(faceDirection);
                 }
             }
         }
     }
 
-    for (Triangle t : triangles)
+    for (unsigned int i = 0; i < triangles.size(); i++)
     {
         // 3D projection
-        Vec2d p1Proj = projectVec3d(t.p1);
-        Vec2d p2Proj = projectVec3d(t.p2);
-        Vec2d p3Proj = projectVec3d(t.p3);
+        Vec2d p1Proj = projectVec3d(triangles[i].p1);
+        Vec2d p2Proj = projectVec3d(triangles[i].p2);
+        Vec2d p3Proj = projectVec3d(triangles[i].p3);
 
         // fill projected triangle
-        fillTriangle(p1Proj, p2Proj, p3Proj, Qt::gray);
+        unsigned int colorVal = std::min(255, (int) (triangleFaceDirections[i] * (-255)));
+        fillTriangle(p1Proj, p2Proj, p3Proj, QColor (colorVal, colorVal, colorVal));
 
         // draw outlines of projected triangle
         drawLine(p1Proj, p2Proj, Qt::red);
