@@ -4,6 +4,7 @@
 #include "renderer/triangle.hpp"
 
 #include <QObject>
+#include <QString>
 
 #include <vector>
 
@@ -13,9 +14,9 @@ class Mesh : public QObject
     Q_OBJECT
 
     public:
-        Mesh(const char* name = "", std::vector<Triangle> triangles = {});
+        Mesh(QString name, std::vector<Triangle> triangles = {});
 
-        const char* name;
+        QString name;
         std::vector<Triangle> triangles;
 
         void addTriangle(Triangle triangle);

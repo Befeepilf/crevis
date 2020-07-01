@@ -2,9 +2,12 @@
 #include "renderer/mesh.hpp"
 #include "renderer/triangle.hpp"
 
+#include <QString>
+
 #include <iostream>
 
-Mesh::Mesh(const char* name, std::vector<Triangle> triangles) : name(name), triangles(triangles)
+
+Mesh::Mesh(QString name, std::vector<Triangle> triangles) : name(name), triangles(triangles)
 {
     angleX = 0;
     angleY = 0;
@@ -16,6 +19,8 @@ Mesh::Mesh(const char* name, std::vector<Triangle> triangles) : name(name), tria
 
     center = new Vec3d(0, 0, 0);
     calcCenter();
+
+    setZTranslation(10);
 }
 
 void Mesh::calcCenter()

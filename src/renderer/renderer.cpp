@@ -208,7 +208,7 @@ void Renderer::render()
         Vec2d p3Proj = projectVec3d(triangles[i].p3);
 
         // fill projected triangle
-        unsigned int colorVal = std::min(255, (int) (triangleFaceDirections[i] * (-255)));
+        unsigned int colorVal = std::max(0, std::min(255, (int) (triangleFaceDirections[i] * (-255))));
         fillTriangle(p1Proj, p2Proj, p3Proj, QColor (colorVal, colorVal, colorVal));
 
         // draw outlines of projected triangle

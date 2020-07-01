@@ -11,7 +11,10 @@ QT += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 
-HEADERS += include/gui/canvas.hpp \
+HEADERS += include/file/file.hpp \
+           include/file/fileLoader.hpp \
+           include/file/parsers/objParser.hpp \
+           include/gui/canvas.hpp \
            include/gui/meshProperties.hpp \
            include/gui/meshesList.hpp \
            include/gui/meshesListItem.hpp \
@@ -24,7 +27,10 @@ HEADERS += include/gui/canvas.hpp \
            include/renderer/vector/vec2d.hpp \
            include/renderer/vector/vec3d.hpp
 
-SOURCES += src/main.cpp \
+SOURCES += src/file/file.cpp \
+           src/file/fileLoader.cpp \
+           src/file/parsers/objParser.cpp \
+           src/main.cpp \
            src/gui/canvas.cpp \
            src/gui/meshProperties.cpp \
            src/gui/meshesList.cpp \

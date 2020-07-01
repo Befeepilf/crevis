@@ -1,3 +1,6 @@
+#include "file/file.hpp"
+#include "file/fileLoader.hpp"
+#include "file/parsers/objParser.hpp"
 #include "gui/canvas.hpp"
 #include "gui/meshesList.hpp"
 #include "gui/meshProperties.hpp"
@@ -12,9 +15,12 @@
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QSlider>
+#include <QString>
+
+#include <iostream>
 
 
-Window::Window(QWidget* parent) : QMainWindow(parent), renderer(new Renderer)
+Window::Window(QWidget* parent) : QMainWindow(parent), renderer(new Renderer), fileLoader(new FileLoader)
 {
     showStatus("Building UI...");
 
@@ -56,6 +62,16 @@ Window::Window(QWidget* parent) : QMainWindow(parent), renderer(new Renderer)
 void Window::createMenus()
 {
     QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
+    QAction* importMeshAct = new QAction("Import Mesh");
+    connect(importMeshAct, &QAction::triggered, fileLoader, [=] () {
+        File* file = fileLoader->openFile({OBJ});
+        if (file != nullptr)
+        {
+            Mesh* mesh = OBJParser::parse(file);
+            if (mesh != nullptr) renderer->addMesh(mesh);
+        }
+    });
+    fileMenu->addAction(importMeshAct);
 }
 
 void Window::createToolbar()
@@ -82,7 +98,7 @@ void Window::createToolbar()
     toolbar->addWidget(fpsLabel);
 }
 
-void Window::showStatus(char* msg)
+void Window::showStatus(QString msg)
 {
-    statusBar()->showMessage(tr(msg));
+    statusBar()->showMessage(msg);
 }
