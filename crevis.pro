@@ -18,6 +18,7 @@ HEADERS += include/file/file.hpp \
            include/gui/meshProperties.hpp \
            include/gui/meshesList.hpp \
            include/gui/meshesListItem.hpp \
+           include/gui/rendererSettings.hpp \
            include/gui/window.hpp \
            include/math/trig.hpp \
            include/renderer/mesh.hpp \
@@ -35,6 +36,7 @@ SOURCES += src/file/file.cpp \
            src/gui/meshProperties.cpp \
            src/gui/meshesList.cpp \
            src/gui/meshesListItem.cpp \
+           src/gui/rendererSettings.cpp \
            src/gui/window.cpp \
            src/math/trig.cpp \
            src/renderer/mesh.cpp \

@@ -18,6 +18,7 @@ Renderer::Renderer(std::vector<Mesh*> meshes) : meshes(meshes)
     width = 200;
     height = 200;
     focalLen = 0.5;
+    showWireframes = 1;
 
     cameraPos = new Vec3d(0, 0, -focalLen);
 }
@@ -54,6 +55,13 @@ void Renderer::setFocalLen(double newFocalLen)
     if (newFocalLen != focalLen) emit focalLenChanged(newFocalLen);
     focalLen = newFocalLen / 200;
     cameraPos->components[2] = -focalLen;
+    render();
+}
+
+void Renderer::setShowWireframes(int state)
+{
+    if (state != showWireframes) emit showWireframesChanged(state);
+    showWireframes = state;
     render();
 }
 
@@ -211,10 +219,12 @@ void Renderer::render()
         unsigned int colorVal = std::max(0, std::min(255, (int) (triangleFaceDirections[i] * (-255))));
         fillTriangle(p1Proj, p2Proj, p3Proj, QColor (colorVal, colorVal, colorVal));
 
-        // draw outlines of projected triangle
-        drawLine(p1Proj, p2Proj, Qt::red);
-        drawLine(p2Proj, p3Proj, Qt::red);
-        drawLine(p3Proj, p1Proj, Qt::red);
+        if (showWireframes)
+        {
+            drawLine(p1Proj, p2Proj, Qt::red);
+            drawLine(p2Proj, p3Proj, Qt::red);
+            drawLine(p3Proj, p1Proj, Qt::red);
+        }
     }
 
     emit renderedFrame(*image);

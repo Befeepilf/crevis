@@ -27,6 +27,7 @@ class Renderer : public QObject
         unsigned int width;
         unsigned int height;
         double focalLen;
+        int showWireframes;
         std::vector<Mesh*> meshes;
         Mesh* selectedMesh;
         QImage* image;
@@ -40,6 +41,7 @@ class Renderer : public QObject
         void setSize(int newWidth, int newHeight);
         void createCube(void);
         void setFocalLen(double newFocalLen);
+        void setShowWireframes(int state);
 
         void render();
 
@@ -47,6 +49,7 @@ class Renderer : public QObject
         void renderedFrame(QImage img);
         void fps(unsigned int fps);
         void focalLenChanged(double focalLen);
+        void showWireframesChanged(int state);
         void addedMesh(Mesh* mesh);
 };
 

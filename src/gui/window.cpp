@@ -4,12 +4,14 @@
 #include "gui/canvas.hpp"
 #include "gui/meshesList.hpp"
 #include "gui/meshProperties.hpp"
+#include "gui/rendererSettings.hpp"
 #include "gui/window.hpp"
 #include "renderer/mesh.hpp"
 #include "renderer/renderer.hpp"
 
 #include <QAction>
 #include <QDockWidget>
+#include <QFormLayout>
 #include <QLabel>
 #include <QMainWindow>
 #include <QMenuBar>
@@ -56,6 +58,12 @@ Window::Window(QWidget* parent) : QMainWindow(parent), renderer(new Renderer), f
     connect(meshesListWidget, &MeshesList::selectedMesh, selectedMeshProperties, &MeshProperties::setMesh);
 
 
+    // dock widget for renderer settings
+    QDockWidget* rendererSettingsContainer = new QDockWidget(tr("Renderer settings"), this);
+    RendererSettings* rendererSettings = new RendererSettings(renderer);
+    rendererSettingsContainer->setWidget(rendererSettings);
+    addDockWidget(Qt::LeftDockWidgetArea, rendererSettingsContainer);
+
     showStatus("Ready");
 }
 
@@ -67,8 +75,10 @@ void Window::createMenus()
         File* file = fileLoader->openFile({OBJ});
         if (file != nullptr)
         {
+            showStatus("Importing mesh...");
             Mesh* mesh = OBJParser::parse(file);
             if (mesh != nullptr) renderer->addMesh(mesh);
+            showStatus("Ready");
         }
     });
     fileMenu->addAction(importMeshAct);
@@ -78,23 +88,18 @@ void Window::createToolbar()
 {
     toolbar = addToolBar(tr("Toolbar"));
 
+
     // button for creating a cube
     QAction* createCubeAct = new QAction(tr("Create cube"), this);
     connect(createCubeAct, &QAction::triggered, renderer, &Renderer::createCube);
     toolbar->addAction(createCubeAct);
 
-    // slider for changing focal length
-    QSlider* focalLenSlider = new QSlider;
-    focalLenSlider->setMinimum(10);
-    focalLenSlider->setMaximum(200);
-    focalLenSlider->setTickInterval(10);
-    focalLenSlider->setValue(renderer->getFocalLen());
-    connect(focalLenSlider, &QSlider::valueChanged, renderer, &Renderer::setFocalLen);
-    connect(renderer, &Renderer::focalLenChanged, focalLenSlider, &QSlider::setValue);
-    toolbar->addWidget(focalLenSlider);
 
     QLabel* fpsLabel = new QLabel;
-    connect(renderer, &Renderer::fps, fpsLabel, qOverload<int>(&QLabel::setNum));
+    fpsLabel->
+    connect(renderer, &Renderer::fps, fpsLabel, [=] (unsigned int fps) {
+        fpsLabel->setText(QString("FPS: %1").arg(fps));
+    });
     toolbar->addWidget(fpsLabel);
 }
 
