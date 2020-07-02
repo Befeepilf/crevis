@@ -18,6 +18,8 @@ class Renderer : public QObject
 
     public:
         Renderer(std::vector<Mesh*> meshes = {});
+        ~Renderer();
+
         double getFocalLen();
         void setWidth(unsigned int width);
         void setHeight(unsigned int height);

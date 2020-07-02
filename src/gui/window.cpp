@@ -67,21 +67,36 @@ Window::Window(QWidget* parent) : QMainWindow(parent), renderer(new Renderer), f
     showStatus("Ready");
 }
 
+Window::~Window()
+{
+    delete renderer;
+    delete fileLoader;
+    for (QAction* a : actions)
+    {
+        delete a;
+    }
+}
+
 void Window::createMenus()
 {
     QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
     QAction* importMeshAct = new QAction("Import Mesh");
+
     connect(importMeshAct, &QAction::triggered, fileLoader, [=] () {
         File* file = fileLoader->openFile({OBJ});
         if (file != nullptr)
         {
             showStatus("Importing mesh...");
             Mesh* mesh = OBJParser::parse(file);
+            delete file;
             if (mesh != nullptr) renderer->addMesh(mesh);
             showStatus("Ready");
         }
     });
+
     fileMenu->addAction(importMeshAct);
+
+    actions.push_back(importMeshAct);
 }
 
 void Window::createToolbar()
@@ -96,7 +111,6 @@ void Window::createToolbar()
 
 
     QLabel* fpsLabel = new QLabel;
-    fpsLabel->
     connect(renderer, &Renderer::fps, fpsLabel, [=] (unsigned int fps) {
         fpsLabel->setText(QString("FPS: %1").arg(fps));
     });

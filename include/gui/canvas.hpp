@@ -15,6 +15,8 @@ class Canvas : public QWidget
 
     public:
         explicit Canvas(QWidget* parent = 0);
+        ~Canvas();
+
         QSize sizeHint(void);
         void resizeEvent(QResizeEvent* event);
 

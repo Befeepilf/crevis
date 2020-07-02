@@ -23,6 +23,11 @@ Mesh::Mesh(QString name, std::vector<Triangle> triangles) : name(name), triangle
     setZTranslation(10);
 }
 
+Mesh::~Mesh()
+{
+    delete center;
+}
+
 void Mesh::calcCenter()
 {
     Vec3d newCenter (0, 0, 0);

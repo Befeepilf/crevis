@@ -15,6 +15,7 @@ class Mesh : public QObject
 
     public:
         Mesh(QString name, std::vector<Triangle> triangles = {});
+        ~Mesh();
 
         QString name;
         std::vector<Triangle> triangles;

@@ -21,6 +21,19 @@ Renderer::Renderer(std::vector<Mesh*> meshes) : meshes(meshes)
     showWireframes = 1;
 
     cameraPos = new Vec3d(0, 0, -focalLen);
+    image = new QImage(width, height, QImage::Format_RGB32);
+}
+
+Renderer::~Renderer()
+{
+    delete cameraPos;
+
+    for (Mesh* m : meshes)
+    {
+        delete m;
+    }
+
+    delete image;
 }
 
 double Renderer::getFocalLen()
@@ -32,6 +45,9 @@ void Renderer::setSize(int newWidth, int newHeight)
 {
     width = newWidth;
     height = newHeight;
+
+    delete image;
+    image = new QImage(width, height, QImage::Format_RGB32);
 
     render();
 }
@@ -155,7 +171,8 @@ void Renderer::render()
 {
     auto renderStart = std::chrono::high_resolution_clock::now();
 
-    image = new QImage(width, height, QImage::Format_RGB32);
+    image->fill(0);
+
 
     std::vector<Triangle> triangles;
     std::vector<double> triangleFaceDirections; // keep track of how much the triangle faces the camera

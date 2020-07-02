@@ -34,6 +34,11 @@ Canvas::Canvas(QWidget* parent) : QWidget(parent)
     setLayout(layout);
 }
 
+Canvas::~Canvas()
+{
+    delete scene;
+}
+
 QSize Canvas::sizeHint()
 {
     return QSize(500, 500);
