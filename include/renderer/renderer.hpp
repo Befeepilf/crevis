@@ -9,6 +9,7 @@
 #include <QImage>
 #include <QObject>
 
+#include <utility>
 #include <vector>
 
 
@@ -35,9 +36,11 @@ class Renderer : public QObject
         QImage* image;
         Vec3d* cameraPos;
 
+        std::vector<std::pair<Triangle, double>> getSortedTrianglesAndFaceDirections(void);
+        double calcTriangleFaceDirection(Triangle t);
         Vec2d projectVec3d(Vec3d v);
-        void drawLine(Vec2d p1, Vec2d p2, QColor color);
         void fillTriangle(Vec2d p1, Vec2d p2, Vec2d p3, QColor color);
+        void drawLine(Vec2d p1, Vec2d p2, QColor color);
 
     public slots:
         void setSize(int newWidth, int newHeight);

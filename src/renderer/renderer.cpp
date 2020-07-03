@@ -10,6 +10,7 @@
 #include <chrono>
 #include <cmath>
 #include <iostream>
+#include <utility>
 #include <vector>
 
 
@@ -81,26 +82,114 @@ void Renderer::setShowWireframes(int state)
     render();
 }
 
-void Renderer::drawLine(Vec2d p1, Vec2d p2, QColor color)
+
+void Renderer::render()
 {
-    double len = 0;
-    len += pow(p1.x() - p2.x(), 2);
-    len += pow(p1.y() - p2.y(), 2);
-    len = sqrt(len);
+    auto renderStart = std::chrono::high_resolution_clock::now();
 
-    unsigned int currLen = 0;
-    while (currLen < len)
+    image->fill(0);
+
+    std::vector<std::pair<Triangle, double>> trianglesAndFaceDirections = getSortedTrianglesAndFaceDirections();
+    
+    for (std::pair<Triangle, double> pair : trianglesAndFaceDirections)
     {
-        const int pixelX = round(p1.x() + currLen * (p2.x() - p1.x()) / len);
-        const int pixelY = round(p1.y() + currLen * (p2.y() - p1.y()) / len);
+        // 3D projection
+        Vec2d p1Proj = projectVec3d(pair.first.p1);
+        Vec2d p2Proj = projectVec3d(pair.first.p2);
+        Vec2d p3Proj = projectVec3d(pair.first.p3);
 
-        if (pixelX >= 0 && pixelX < width && pixelY >= 0 && pixelY < height)
+        // fill projected triangle
+        unsigned int colorVal = std::max(0, std::min(255, (int) (pair.second * (-255))));
+        fillTriangle(p1Proj, p2Proj, p3Proj, QColor (colorVal, colorVal, colorVal));
+
+        if (showWireframes)
         {
-            image->setPixelColor(pixelX, pixelY, color);
+            drawLine(p1Proj, p2Proj, Qt::red);
+            drawLine(p2Proj, p3Proj, Qt::red);
+            drawLine(p3Proj, p1Proj, Qt::red);
         }
-
-        currLen++;
     }
+
+    emit renderedFrame(*image);
+
+    auto renderEnd = std::chrono::high_resolution_clock::now();
+    auto renderTime = std::chrono::duration_cast<std::chrono::microseconds>(renderEnd - renderStart).count();
+
+    emit fps(1000000 / renderTime);
+}
+
+std::vector<std::pair<Triangle, double>> Renderer::getSortedTrianglesAndFaceDirections()
+{
+    std::vector<std::pair<Triangle, double>> trianglesAndFaceDirections;
+
+    // collect all triangles in a single vector sorted by avgZ
+    // to paint farthest triangles first
+    for (Mesh* m : meshes)
+    {
+        for (Triangle triangle : m->triangles)
+        {
+            double faceDirection = calcTriangleFaceDirection(triangle);
+            
+            // filter out triangles not facing the camera
+            if (faceDirection < 0)
+            {
+                if (trianglesAndFaceDirections.size() > 0)
+                {
+                    // binary insertion sort
+
+                    int l = 0;
+                    int r = trianglesAndFaceDirections.size() - 1;
+                    unsigned int m;
+
+                    while (l <= r)
+                    {
+                        m = l + (r - l) / 2;
+                        if (trianglesAndFaceDirections[m].first.avgZ < triangle.avgZ)
+                        {
+                            r = m - 1;
+                        }
+                        else if (trianglesAndFaceDirections[m].first.avgZ > triangle.avgZ)
+                        {
+                            l = m + 1;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    trianglesAndFaceDirections.insert(
+                        trianglesAndFaceDirections.begin() + m,
+                        {triangle, faceDirection}
+                    );
+                }
+                else
+                {
+                    trianglesAndFaceDirections.push_back({triangle, faceDirection});
+                }
+            }
+        }
+    }
+
+    return trianglesAndFaceDirections;
+}
+
+double Renderer::calcTriangleFaceDirection(Triangle t)
+{
+    Vec3d normalVec = crossProd(t.p2 - t.p1, t.p3 - t.p1);
+    Vec3d viewDir = t.p1 - *cameraPos;
+    double faceDirection = normalVec * viewDir; // measurement of how much the triangle faces the camera
+    return faceDirection;
+}
+
+Vec2d Renderer::projectVec3d(Vec3d v)
+{
+    double corr = height * focalLen / (v.z() + focalLen);
+
+    int x = v.x() * corr + width/2;
+    int y = v.y() * corr + height/2;
+
+    return Vec2d(x, y);
 }
 
 void Renderer::fillTriangle(Vec2d p1, Vec2d p2, Vec2d p3, QColor color)
@@ -157,97 +246,24 @@ void Renderer::fillTriangle(Vec2d p1, Vec2d p2, Vec2d p3, QColor color)
    }
 }
 
-Vec2d Renderer::projectVec3d(Vec3d v)
+void Renderer::drawLine(Vec2d p1, Vec2d p2, QColor color)
 {
-    double corr = height * focalLen / (v.z() + focalLen);
+    double len = 0;
+    len += pow(p1.x() - p2.x(), 2);
+    len += pow(p1.y() - p2.y(), 2);
+    len = sqrt(len);
 
-    int x = v.x() * corr + width/2;
-    int y = v.y() * corr + height/2;
-
-    return Vec2d(x, y);
-}
-
-void Renderer::render()
-{
-    auto renderStart = std::chrono::high_resolution_clock::now();
-
-    image->fill(0);
-
-
-    std::vector<Triangle> triangles;
-    std::vector<double> triangleFaceDirections; // keep track of how much the triangle faces the camera
-
-    // collect all triangles in a single vector sorted by avgZ
-    // to paint farthest triangles first
-    for (Mesh* m : meshes)
+    unsigned int currLen = 0;
+    while (currLen < len)
     {
-        for (Triangle t : m->triangles)
+        const int pixelX = round(p1.x() + currLen * (p2.x() - p1.x()) / len);
+        const int pixelY = round(p1.y() + currLen * (p2.y() - p1.y()) / len);
+
+        if (pixelX >= 0 && pixelX < width && pixelY >= 0 && pixelY < height)
         {
-            Vec3d normalVec = crossProd(t.p2 - t.p1, t.p3 - t.p1);
-            Vec3d viewDir = t.p1 - *cameraPos;
-            double faceDirection = normalVec * viewDir;
-
-            // filter out triangles not facing the camera
-            if (faceDirection < 0)
-            {
-                if (triangles.size() > 0)
-                {
-                    int l = 0;
-                    int r = triangles.size() - 1;
-                    unsigned int m;
-
-                    while (l <= r)
-                    {
-                        m = l + (r - l) / 2;
-                        if (triangles[m].avgZ < t.avgZ)
-                        {
-                            r = m - 1;
-                        }
-                        else if (triangles[m].avgZ > t.avgZ)
-                        {
-                            l = m + 1;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-
-                    triangles.insert(triangles.begin() + m, t);
-                    triangleFaceDirections.insert(triangleFaceDirections.begin() + m, faceDirection);
-                }
-                else
-                {
-                    triangles.push_back(t);
-                    triangleFaceDirections.push_back(faceDirection);
-                }
-            }
+            image->setPixelColor(pixelX, pixelY, color);
         }
+
+        currLen++;
     }
-
-    for (unsigned int i = 0; i < triangles.size(); i++)
-    {
-        // 3D projection
-        Vec2d p1Proj = projectVec3d(triangles[i].p1);
-        Vec2d p2Proj = projectVec3d(triangles[i].p2);
-        Vec2d p3Proj = projectVec3d(triangles[i].p3);
-
-        // fill projected triangle
-        unsigned int colorVal = std::max(0, std::min(255, (int) (triangleFaceDirections[i] * (-255))));
-        fillTriangle(p1Proj, p2Proj, p3Proj, QColor (colorVal, colorVal, colorVal));
-
-        if (showWireframes)
-        {
-            drawLine(p1Proj, p2Proj, Qt::red);
-            drawLine(p2Proj, p3Proj, Qt::red);
-            drawLine(p3Proj, p1Proj, Qt::red);
-        }
-    }
-
-    emit renderedFrame(*image);
-
-    auto renderEnd = std::chrono::high_resolution_clock::now();
-    auto renderTime = std::chrono::duration_cast<std::chrono::microseconds>(renderEnd - renderStart).count();
-
-    emit fps(1000000 / renderTime);
 }
