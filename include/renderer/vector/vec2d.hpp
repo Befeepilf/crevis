@@ -9,8 +9,8 @@ class Vec2d : public Vec
         Vec2d(const double x, const double y);
         double x(void);
         double y(void);
-        void rotateX(const double angle);
-        void rotateY(const double angle);
+        void rotateX(const double rad);
+        void rotateY(const double rad);
         void translateX(const double amount);
         void translateY(const double amount);
 

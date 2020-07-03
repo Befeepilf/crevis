@@ -13,13 +13,13 @@ double Vec3d::z()
     return components[2];
 }
 
-void Vec3d::rotateZ(const double angle)
+void Vec3d::rotateZ(const double rad)
 {    
     const double oldX = components[0];
     const double oldY = components[1];
 
-    components[0] = oldX * std::cos(angle) - oldY * std::sin(angle);
-    components[1] = oldX * std::sin(angle) + oldY * std::cos(angle);
+    components[0] = oldX * std::cos(rad) - oldY * std::sin(rad);
+    components[1] = oldX * std::sin(rad) + oldY * std::cos(rad);
 }
 
 

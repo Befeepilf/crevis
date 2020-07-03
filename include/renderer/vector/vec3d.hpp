@@ -8,7 +8,7 @@ class Vec3d : public Vec2d
     public:
         Vec3d(const double x, const double y, const double z);
         double z(void);
-        void rotateZ(const double angle);
+        void rotateZ(const double rad);
         void translateZ(const double amount);
 
         // operator overload: add two vectors

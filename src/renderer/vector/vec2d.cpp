@@ -17,22 +17,22 @@ double Vec2d::y()
     return components[1];
 }
 
-void Vec2d::rotateX(const double angle)
+void Vec2d::rotateX(const double rad)
 {
     const double oldY = components[1];
     const double oldZ = components[2];
 
-    components[1] = oldY * std::cos(angle) - oldZ * std::sin(angle);
-    components[2] = oldY * std::sin(angle) + oldZ * std::cos(angle);
+    components[1] = oldY * std::cos(rad) - oldZ * std::sin(rad);
+    components[2] = oldY * std::sin(rad) + oldZ * std::cos(rad);
 }
 
-void Vec2d::rotateY(const double angle)
+void Vec2d::rotateY(const double rad)
 {
     const double oldX = components[0];
     const double oldZ = components[2];
 
-    components[0] = oldX * std::cos(angle) + oldZ * std::sin(angle);
-    components[2] = -oldX * std::sin(angle) + oldZ * std::cos(angle);
+    components[0] = oldX * std::cos(rad) + oldZ * std::sin(rad);
+    components[2] = -oldX * std::sin(rad) + oldZ * std::cos(rad);
 }
 
 

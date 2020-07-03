@@ -84,7 +84,7 @@ void Renderer::setShowWireframes(int state)
 
 
 void Renderer::render()
-{
+{    
     auto renderStart = std::chrono::high_resolution_clock::now();
 
     image->fill(0);
