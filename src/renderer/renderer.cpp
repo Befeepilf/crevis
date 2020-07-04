@@ -207,11 +207,11 @@ std::deque<std::vector<Vec2d>> Renderer::clip2DTriangle(Vec2d p1, Vec2d p2, Vec2
         // left vertical line
         {Vec2d(0, 0), Vec2d(0, 1)},
         // right vertical line
-        {Vec2d(width, 0), Vec2d(0, -1)},
+        {Vec2d(width - 1, 0), Vec2d(0, -1)},
         // top horizontal line
         {Vec2d(0, 0), Vec2d(-1, 0)},
         // bottom horizontal line
-        {Vec2d(0, height), Vec2d(1, 0)}
+        {Vec2d(0, height - 1), Vec2d(1, 0)}
     };
 
     int i = 0;
@@ -244,7 +244,7 @@ std::deque<std::vector<Vec2d>> Renderer::clip2DTriangle(Vec2d p1, Vec2d p2, Vec2
                 }
             }
 
-            
+
             // nothing to clip regarding this line
             if (pointsBehindLine.size() == 0)
             {
@@ -344,10 +344,7 @@ void Renderer::fillTriangle(Vec2d p1, Vec2d p2, Vec2d p3, QColor color)
             // if point is inside triangle, draw it
             if (a >= 0 && b >= 0 && (a + b) <= 1)
             {
-                if (x >= 0 && x < width && y >= 0 && y < height)
-                {
-                    image->setPixelColor(x, y, color);
-                }
+                image->setPixelColor(x, y, color);
             }
        }
    }
