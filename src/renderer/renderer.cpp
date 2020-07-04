@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <deque>
 #include <iostream>
 #include <utility>
 #include <vector>
@@ -84,11 +85,12 @@ void Renderer::setShowWireframes(int state)
 
 
 void Renderer::render()
-{    
+{
     auto renderStart = std::chrono::high_resolution_clock::now();
 
     image->fill(0);
 
+    // sort triangles by avgZ to paint farthest triangles first
     std::vector<std::pair<Triangle, double>> trianglesAndFaceDirections = getSortedTrianglesAndFaceDirections();
     
     for (std::pair<Triangle, double> pair : trianglesAndFaceDirections)
@@ -98,15 +100,20 @@ void Renderer::render()
         Vec2d p2Proj = projectVec3d(pair.first.p2);
         Vec2d p3Proj = projectVec3d(pair.first.p3);
 
-        // fill projected triangle
-        unsigned int colorVal = std::max(0, std::min(255, (int) (pair.second * (-255))));
-        fillTriangle(p1Proj, p2Proj, p3Proj, QColor (colorVal, colorVal, colorVal));
+        // clipping this triangle might result in multiple new triangles
+        std::deque<std::vector<Vec2d>> newTriangles = clip2DTriangle(p1Proj, p2Proj, p3Proj);
 
-        if (showWireframes)
+        for (std::vector<Vec2d> newT : newTriangles)
         {
-            drawLine(p1Proj, p2Proj, Qt::red);
-            drawLine(p2Proj, p3Proj, Qt::red);
-            drawLine(p3Proj, p1Proj, Qt::red);
+            unsigned int colorVal = std::max(0, std::min(255, (int) (pair.second * (-255))));
+            fillTriangle(newT[0], newT[1], newT[2], QColor (colorVal, colorVal, colorVal));
+
+            if (showWireframes)
+            {
+                drawLine(newT[0], newT[1], Qt::red);
+                drawLine(newT[1], newT[2], Qt::red);
+                drawLine(newT[2], newT[0], Qt::red);
+            }
         }
     }
 
@@ -122,8 +129,6 @@ std::vector<std::pair<Triangle, double>> Renderer::getSortedTrianglesAndFaceDire
 {
     std::vector<std::pair<Triangle, double>> trianglesAndFaceDirections;
 
-    // collect all triangles in a single vector sorted by avgZ
-    // to paint farthest triangles first
     for (Mesh* m : meshes)
     {
         for (Triangle triangle : m->triangles)
@@ -190,6 +195,108 @@ Vec2d Renderer::projectVec3d(Vec3d v)
     int y = v.y() * corr + height/2;
 
     return Vec2d(x, y);
+}
+
+std::deque<std::vector<Vec2d>> Renderer::clip2DTriangle(Vec2d p1, Vec2d p2, Vec2d p3)
+{
+    std::deque<std::vector<Vec2d>> trianglesToClip;
+    trianglesToClip.push_back({p1, p2, p3});
+    
+    // boundaries of viewport defined by a point and a vector pointing along line
+    std::vector<std::pair<Vec2d, Vec2d>> lines = {
+        // left vertical line
+        {Vec2d(0, 0), Vec2d(0, 1)},
+        // right vertical line
+        {Vec2d(width, 0), Vec2d(0, -1)},
+        // top horizontal line
+        {Vec2d(0, 0), Vec2d(-1, 0)},
+        // bottom horizontal line
+        {Vec2d(0, height), Vec2d(1, 0)}
+    };
+
+    int i = 0;
+
+    // clip against every line
+    for (std::pair<Vec2d, Vec2d> line : lines)
+    {
+        std::deque<std::vector<Vec2d>> newTrianglesToClip;
+
+        while (!trianglesToClip.empty())
+        {
+            std::vector<Vec2d> currentTriangle = trianglesToClip.front();
+
+            std::vector<Vec2d> pointsBehindLine;
+            std::vector<Vec2d> pointsInFrontOfLine;
+
+            for (Vec2d point : currentTriangle)
+            {
+                // vector from point on line to point of triangle
+                Vec2d s = point - line.first;
+
+                // if perp dot product is > 0 than s is clockwise from line and isn't beyond this side of viewport
+                if (perpDot(s, line.second) < 0)
+                {
+                    pointsBehindLine.push_back(point);
+                }
+                else
+                {
+                    pointsInFrontOfLine.push_back(point);
+                }
+            }
+
+            
+            // nothing to clip regarding this line
+            if (pointsBehindLine.size() == 0)
+            {
+                newTrianglesToClip.push_back(currentTriangle);
+            }
+            // one point lies beyond line -> split into two triangles
+            else if (pointsBehindLine.size() == 1)
+            {
+                // calculate intersection points
+
+                // line from point behind line to point 1 in front of line
+                Vec2d s1 = pointsInFrontOfLine[0] - pointsBehindLine[0];
+                // line from point behind line to point 2 in front of line
+                Vec2d s2 = pointsInFrontOfLine[1] - pointsBehindLine[0];
+
+                // use Cramer's rule to find scaling factors
+                double scaleS1 = perpDot(s1, pointsBehindLine[0] - line.first) / perpDot(s1, line.second);
+                double scaleS2 = perpDot(s2, pointsBehindLine[0] - line.first) / perpDot(s2, line.second);
+
+                Vec2d intersectionPoint1 = line.first + line.second * scaleS1;
+                Vec2d intersectionPoint2 = line.first + line.second * scaleS2;
+
+                // form new triangles
+                newTrianglesToClip.push_back({intersectionPoint1, pointsInFrontOfLine[0], pointsInFrontOfLine[1]});
+                newTrianglesToClip.push_back({intersectionPoint2, intersectionPoint1, pointsInFrontOfLine[1]});
+            }
+            else if (pointsBehindLine.size() == 2)
+            {   
+                // calculate intersection points
+
+                Vec2d s1 = pointsBehindLine[0] - pointsInFrontOfLine[0];
+                Vec2d s2 = pointsBehindLine[1] - pointsInFrontOfLine[0];
+
+                double scaleS1 = perpDot(s1, pointsInFrontOfLine[0] - line.first) / perpDot(s1, line.second);
+                double scaleS2 = perpDot(s2, pointsInFrontOfLine[0] - line.first) / perpDot(s2, line.second);
+
+                Vec2d intersectionPoint1 = line.first + line.second * scaleS1;
+                Vec2d intersectionPoint2 = line.first + line.second * scaleS2;
+
+                // form new triangle
+                newTrianglesToClip.push_back({pointsInFrontOfLine[0], intersectionPoint1, intersectionPoint2});
+            }
+
+            trianglesToClip.pop_front();
+        }
+
+        trianglesToClip = newTrianglesToClip;
+
+        i++;
+    }
+
+    return trianglesToClip;
 }
 
 void Renderer::fillTriangle(Vec2d p1, Vec2d p2, Vec2d p3, QColor color)

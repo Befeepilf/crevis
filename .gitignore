@@ -36,4 +36,5 @@ build/
 .qmake.stash
 Makefile
 /vgcore*
+/perf.data
 crevis.suppressions
