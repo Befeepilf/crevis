@@ -24,6 +24,8 @@ Renderer::Renderer(std::vector<Mesh*> meshes) : meshes(meshes)
 
     cameraPos = new Vec3d(0, 0, -focalLen);
     image = new QImage(width, height, QImage::Format_RGB32);
+
+    setViewportBorderLines();
 }
 
 Renderer::~Renderer()
@@ -38,6 +40,21 @@ Renderer::~Renderer()
     delete image;
 }
 
+void Renderer::setViewportBorderLines()
+{
+    // boundaries of viewport defined by a point on the line and a vector pointing along the line
+    viewportBorderLines = {
+        // left vertical line
+        {Vec2d(0, 0), Vec2d(0, 1)},
+        // right vertical line
+        {Vec2d(width - 1, 0), Vec2d(0, -1)},
+        // top horizontal line
+        {Vec2d(0, 0), Vec2d(-1, 0)},
+        // bottom horizontal line
+        {Vec2d(0, height - 1), Vec2d(1, 0)}
+    };
+}
+
 double Renderer::getFocalLen()
 {
     return focalLen * 200;
@@ -47,6 +64,8 @@ void Renderer::setSize(int newWidth, int newHeight)
 {
     width = newWidth;
     height = newHeight;
+
+    setViewportBorderLines();
 
     delete image;
     image = new QImage(width, height, QImage::Format_RGB32);
@@ -201,23 +220,9 @@ std::deque<std::vector<Vec2d>> Renderer::clip2DTriangle(Vec2d p1, Vec2d p2, Vec2
 {
     std::deque<std::vector<Vec2d>> trianglesToClip;
     trianglesToClip.push_back({p1, p2, p3});
-    
-    // boundaries of viewport defined by a point and a vector pointing along line
-    std::vector<std::pair<Vec2d, Vec2d>> lines = {
-        // left vertical line
-        {Vec2d(0, 0), Vec2d(0, 1)},
-        // right vertical line
-        {Vec2d(width - 1, 0), Vec2d(0, -1)},
-        // top horizontal line
-        {Vec2d(0, 0), Vec2d(-1, 0)},
-        // bottom horizontal line
-        {Vec2d(0, height - 1), Vec2d(1, 0)}
-    };
 
-    int i = 0;
-
-    // clip against every line
-    for (std::pair<Vec2d, Vec2d> line : lines)
+    // clip against every border line of viewport
+    for (std::pair<Vec2d, Vec2d> line : viewportBorderLines)
     {
         std::deque<std::vector<Vec2d>> newTrianglesToClip;
 
@@ -292,8 +297,6 @@ std::deque<std::vector<Vec2d>> Renderer::clip2DTriangle(Vec2d p1, Vec2d p2, Vec2
         }
 
         trianglesToClip = newTrianglesToClip;
-
-        i++;
     }
 
     return trianglesToClip;

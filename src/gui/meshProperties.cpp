@@ -56,24 +56,24 @@ void MeshProperties::createTranslationSliders()
 
     // slider for changing X rotation of selected mesh
     translateXSlider = new QSlider;
-    translateXSlider->setMinimum(-100);
-    translateXSlider->setMaximum(100);
+    translateXSlider->setMinimum(-1000);
+    translateXSlider->setMaximum(1000);
     translateXSlider->setTickInterval(1);
     translateXSlider->setValue(0);
     translationSlidersLayout->addWidget(translateXSlider);
 
     // slider for changing Y rotation of selected mesh
     translateYSlider = new QSlider;
-    translateYSlider->setMinimum(-100);
-    translateYSlider->setMaximum(100);
+    translateYSlider->setMinimum(-1000);
+    translateYSlider->setMaximum(1000);
     translateYSlider->setTickInterval(1);
     translateYSlider->setValue(0);
     translationSlidersLayout->addWidget(translateYSlider);
 
     // slider for changing Z rotation of selected mesh
     translateZSlider = new QSlider;
-    translateZSlider->setMinimum(-100);
-    translateZSlider->setMaximum(100);
+    translateZSlider->setMinimum(-1000);
+    translateZSlider->setMaximum(1000);
     translateZSlider->setTickInterval(1);
     translateZSlider->setValue(0);
     translationSlidersLayout->addWidget(translateZSlider);
@@ -86,32 +86,43 @@ void MeshProperties::setMesh(Mesh* newMesh)
 {
     if (mesh != nullptr)
     {
-        disconnect(rotXSlider, &QSlider::valueChanged, mesh, &Mesh::setXRotation);
-        disconnect(rotYSlider, &QSlider::valueChanged, mesh, &Mesh::setYRotation);
-        disconnect(rotZSlider, &QSlider::valueChanged, mesh, &Mesh::setZRotation);
-
-        disconnect(translateXSlider, &QSlider::valueChanged, mesh, &Mesh::setXTranslation);
-        disconnect(translateYSlider, &QSlider::valueChanged, mesh, &Mesh::setYTranslation);
-        disconnect(translateZSlider, &QSlider::valueChanged, mesh, &Mesh::setZTranslation);
+        while (!connections.empty())
+        {
+            disconnect(connections.front());
+            connections.pop();
+        }
     }
 
     if (newMesh != nullptr)
     {
+        // set initial values of rotation sliders
         rotXSlider->setValue(newMesh->getAngleX());
         rotYSlider->setValue(newMesh->getAngleY());
         rotZSlider->setValue(newMesh->getAngleZ());
 
+        // set initial values of translation sliders
         translateXSlider->setValue(newMesh->getTranslationX() * 100);
         translateYSlider->setValue(newMesh->getTranslationY() * 100);
         translateZSlider->setValue(newMesh->getTranslationZ() * 100);
 
-        connect(rotXSlider, &QSlider::valueChanged, newMesh, &Mesh::setXRotation);
-        connect(rotYSlider, &QSlider::valueChanged, newMesh, &Mesh::setYRotation);
-        connect(rotZSlider, &QSlider::valueChanged, newMesh, &Mesh::setZRotation);
+        // connection rotation sliders with newMesh
+        connections.push(connect(rotXSlider, &QSlider::valueChanged, newMesh, &Mesh::setXRotation));
+        connections.push(connect(rotYSlider, &QSlider::valueChanged, newMesh, &Mesh::setYRotation));
+        connections.push(connect(rotZSlider, &QSlider::valueChanged, newMesh, &Mesh::setZRotation));
 
-        connect(translateXSlider, &QSlider::valueChanged, newMesh, [=] (int value) {newMesh->setXTranslation(value / 100.0);});
-        connect(translateYSlider, &QSlider::valueChanged, newMesh, [=] (int value) {newMesh->setYTranslation(value / 100.0);});
-        connect(translateZSlider, &QSlider::valueChanged, newMesh, [=] (int value) {newMesh->setZTranslation(value / 100.0);});
+        // connect translation sliders with newMesh
+        connections.push(connect(
+            translateXSlider, &QSlider::valueChanged,
+            newMesh, [=] (int value) {newMesh->setXTranslation(value / 100.0);}
+        ));
+        connections.push(connect(
+            translateYSlider, &QSlider::valueChanged,
+            newMesh, [=] (int value) {newMesh->setYTranslation(value / 100.0);}
+        ));
+        connections.push(connect(
+            translateZSlider, &QSlider::valueChanged,
+            newMesh, [=] (int value) {newMesh->setZTranslation(value / 100.0);}
+        ));
 
         show();
     }

@@ -20,7 +20,7 @@ Mesh::Mesh(QString name, std::vector<Triangle> triangles) : name(name), triangle
     center = new Vec3d(0, 0, 0);
     calcCenter();
 
-    setZTranslation(10);
+    setZTranslation(5);
 }
 
 Mesh::~Mesh()

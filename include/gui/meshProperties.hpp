@@ -8,6 +8,8 @@
 #include <QSlider>
 #include <QWidget>
 
+#include <queue>
+
 
 class MeshProperties : public QWidget
 {
@@ -29,6 +31,8 @@ class MeshProperties : public QWidget
         QSlider* translateXSlider;
         QSlider* translateYSlider;
         QSlider* translateZSlider;
+
+        std::queue<QMetaObject::Connection> connections;
 
         Mesh* mesh;
 

@@ -36,6 +36,9 @@ class Renderer : public QObject
         Mesh* selectedMesh;
         QImage* image;
         Vec3d* cameraPos;
+        std::vector<std::pair<Vec2d, Vec2d>> viewportBorderLines;
+
+        void setViewportBorderLines(void);
 
         std::vector<std::pair<Triangle, double>> getSortedTrianglesAndFaceDirections();
         double calcTriangleFaceDirection(Triangle t);
