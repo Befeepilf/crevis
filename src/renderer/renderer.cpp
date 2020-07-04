@@ -330,9 +330,10 @@ void Renderer::fillTriangle(Vec2d p1, Vec2d p2, Vec2d p3, QColor color)
 
    for (unsigned int x = xMin; x <= xMax; x++)
    {
+       int wasInside = 0;
        for (unsigned int y = yMin; y <= yMax; y++)
        {
-            Vec2d P (x - p1.x(), y - p1.y());
+            Vec2d P (x - p1.x(), y - p1.y()); // this is causing a lot of malloc's and _int_free's
 
             /*
                 Cramer's rule
@@ -340,6 +341,7 @@ void Renderer::fillTriangle(Vec2d p1, Vec2d p2, Vec2d p3, QColor color)
                 to the determinant of a 2x2 matrix where its columns
                 are these two vectors
             */
+
             double fac = 1 / perpDot(s1, s2);
             double a = perpDot(P, s2) * fac;
             double b = perpDot(s1, P) * fac;
@@ -348,6 +350,12 @@ void Renderer::fillTriangle(Vec2d p1, Vec2d p2, Vec2d p3, QColor color)
             if (a >= 0 && b >= 0 && (a + b) <= 1)
             {
                 image->setPixelColor(x, y, color);
+                wasInside = 1;
+            }
+            // we were already inside triangle and are now outside -> early break
+            else if (wasInside)
+            {
+                break;
             }
        }
    }
