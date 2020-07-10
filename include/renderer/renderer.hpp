@@ -23,6 +23,7 @@ class Renderer : public QObject
         ~Renderer();
 
         double getFocalLen();
+        int getShowWireframes();
         void setWidth(unsigned int width);
         void setHeight(unsigned int height);
         void addMesh(Mesh* mesh);

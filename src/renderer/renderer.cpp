@@ -60,6 +60,11 @@ double Renderer::getFocalLen()
     return focalLen * 200;
 }
 
+int Renderer::getShowWireframes()
+{
+    return showWireframes;
+}
+
 void Renderer::setSize(int newWidth, int newHeight)
 {
     width = newWidth;
